@@ -27,9 +27,15 @@ api_key = os.getenv("OPENAI_API_KEY")
 
 import streamlit as st
 
-st.title("AI Life Organizer")
+st.title("🧠 AI Life Organizer")
+st.caption("Turn your thoughts into organized goals, tasks, and habits.")
+st.divider()
 
-brain_dump = st.text_area("Write everything on your mind")
+brain_dump = st.text_area(
+    "🧠 Brain Dump",
+    placeholder="Write everything on your mind...\n\nExample:\nCall mom\nBuy groceries\nStart learning Python\nGo to the gym daily",
+    height=200
+)
 
 def organize_text(text):
     goals = []
@@ -74,22 +80,28 @@ def generate_daily_plan(tasks):
     return morning, afternoon, evening
 
 
-if st.button("Organize My Life", key="organize_button"):
+if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
 
     goals, tasks, habits = organize_text(brain_dump)
 
-    st.subheader("🎯 Goals")
-    for g in goals:
-        st.write("•", g)
+    col1, col2, col3 = st.columns(3)
 
-    st.subheader("📋 Tasks")
-    for t in tasks:
-        add_task(t)
-        st.write("•", t)
+    with col1:
+        st.subheader("🎯 Goals")
+        for g in goals:
+            st.write("•", g)
 
-    st.subheader("🔁 Habits")
-    for h in habits:
-        st.write("•", h)
+    with col2:
+        st.subheader("📋 Tasks")
+        for t in tasks:
+            add_task(t)
+            st.write("•", t)
+
+    with col3:
+        st.subheader("🔁 Habits")
+        for h in habits:
+            st.write("•", h)
+
 
 st.subheader("🗂 Saved Tasks")
 
@@ -105,6 +117,7 @@ for task in saved_tasks:
     else:
         if st.button(f"Complete: {task_text}", key=f"task_{task_id}"):
             complete_task(task_id)
+            st.success("Task completed!")
             st.experimental_rerun()
 
 st.subheader("🗓 Daily Plan")
