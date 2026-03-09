@@ -27,6 +27,8 @@ api_key = os.getenv("OPENAI_API_KEY")
 
 import streamlit as st
 
+print(add_task)
+
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
 st.divider()
@@ -84,6 +86,9 @@ if st.button("✨ Organize My Life", key="organize_button", use_container_width=
 
     goals, tasks, habits = organize_text(brain_dump)
 
+    for t in tasks:
+        add_task(t)
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -94,7 +99,6 @@ if st.button("✨ Organize My Life", key="organize_button", use_container_width=
     with col2:
         st.subheader("📋 Tasks")
         for t in tasks:
-            add_task(t)
             st.write("•", t)
 
     with col3:

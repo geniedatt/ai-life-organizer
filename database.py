@@ -10,21 +10,22 @@ CREATE TABLE IF NOT EXISTS tasks (
     completed INTEGER DEFAULT 0
 )
 """)
-
 conn.commit()
 
 
 def add_task(task):
-    cursor.execute("SELECT * FROM tasks WHERE task=?", (task,))
+    clean_task = task.strip().lower()
+
+    cursor.execute("SELECT * FROM tasks WHERE LOWER(task)=?", (clean_task,))
     exists = cursor.fetchone()
 
     if not exists:
-        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (task,))
+        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (clean_task,))
         conn.commit()
 
 
 def get_tasks():
-    cursor.execute("SELECT * FROM tasks")
+    cursor.execute("SELECT id, task, completed FROM tasks")
     return cursor.fetchall()
 
 
