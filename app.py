@@ -1,3 +1,30 @@
+'''
+Your Computer
+      ↓
+GitHub (store the code)
+      ↓
+Streamlit Cloud (deploy website)
+      ↓
+Flutter mobile wrapper
+      ↓
+Google Play Store + Apple App Store
+
+
+
+What has been built could evolve into something like:
+
+AI life planner
+
+productivity AI assistant
+
+task-to-action generator
+
+'''
+from database import add_task, get_tasks, complete_task
+
+import os
+api_key = os.getenv("OPENAI_API_KEY")
+
 import streamlit as st
 
 st.title("AI Life Organizer")
@@ -39,8 +66,25 @@ if st.button("Organize My Life", key="organize_button"):
 
     st.subheader("📋 Tasks")
     for t in tasks:
+        add_task(t)
         st.write("•", t)
 
     st.subheader("🔁 Habits")
     for h in habits:
         st.write("•", h)
+
+st.subheader("🗂 Saved Tasks")
+
+saved_tasks = get_tasks()
+
+for task in saved_tasks:
+    task_id = task[0]
+    task_text = task[1]
+    completed = task[2]
+
+    if completed:
+        st.write(f"✅ {task_text}")
+    else:
+        if st.button(f"Complete: {task_text}", key=f"task_{task_id}"):
+            complete_task(task_id)
+            st.experimental_rerun()
