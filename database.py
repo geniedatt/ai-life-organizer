@@ -15,8 +15,12 @@ conn.commit()
 
 
 def add_task(task):
-    cursor.execute("INSERT INTO tasks (task) VALUES (?)", (task,))
-    conn.commit()
+    cursor.execute("SELECT * FROM tasks WHERE task=?", (task,))
+    exists = cursor.fetchone()
+
+    if not exists:
+        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (task,))
+        conn.commit()
 
 
 def get_tasks():

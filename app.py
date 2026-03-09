@@ -56,6 +56,24 @@ def organize_text(text):
     return goals, tasks, habits
 
 
+def generate_daily_plan(tasks):
+    morning = []
+    afternoon = []
+    evening = []
+
+    for i, task in enumerate(tasks):
+        task_text = task[1]
+
+        if i % 3 == 0:
+            morning.append(task_text)
+        elif i % 3 == 1:
+            afternoon.append(task_text)
+        else:
+            evening.append(task_text)
+
+    return morning, afternoon, evening
+
+
 if st.button("Organize My Life", key="organize_button"):
 
     goals, tasks, habits = organize_text(brain_dump)
@@ -88,3 +106,21 @@ for task in saved_tasks:
         if st.button(f"Complete: {task_text}", key=f"task_{task_id}"):
             complete_task(task_id)
             st.experimental_rerun()
+
+st.subheader("🗓 Daily Plan")
+
+saved_tasks = get_tasks()
+
+morning, afternoon, evening = generate_daily_plan(saved_tasks)
+
+st.write("☀️ Morning")
+for t in morning:
+    st.write("•", t)
+
+st.write("🌤 Afternoon")
+for t in afternoon:
+    st.write("•", t)
+
+st.write("🌙 Evening")
+for t in evening:
+    st.write("•", t)
