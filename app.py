@@ -51,10 +51,20 @@ def extract_sentences(text):
             continue
 
         # remove filler phrases
-        sentence = re.sub(r"\b(tomorrow|today|tonight)\b", "", sentence, flags=re.IGNORECASE)
-        sentence = re.sub(r"\b(i need to|need to|i want to|remember to)\b", "", sentence, flags=re.IGNORECASE)
+        sentence = re.sub(
+            r"\b(tomorrow|today|tonight|later)\b",
+            "",
+            sentence,
+            flags=re.IGNORECASE
+        )
 
-        # split tasks
+        sentence = re.sub(
+            r"\b(i need to|need to|i want to|remember to|i should)\b",
+            "",
+            sentence,
+            flags=re.IGNORECASE
+        )
+
         parts = re.split(r",|\band\b", sentence, flags=re.IGNORECASE)
 
         for part in parts:
@@ -71,9 +81,18 @@ def organize_text(text):
     tasks = []
     habits = []
 
-    goal_words = ["learn", "start", "build", "launch", "create"]
-    habit_words = ["daily", "every", "routine", "habit", "gym"]
-    task_words = ["call", "buy", "clean", "finish", "send", "email"]
+    goal_words = [
+    "learn","start","build","launch","create","develop","study","improve"
+]
+
+    habit_words = [
+        "daily","every","routine","habit","gym","exercise","meditate","read"
+    ]
+
+    task_verbs = [
+        "call","buy","clean","finish","send","email","schedule","pay","write",
+        "review","fix","prepare","submit","update","plan","organize","meet"
+]
 
     lines = extract_sentences(text)
 
@@ -89,7 +108,7 @@ def organize_text(text):
         elif any(word in l for word in habit_words):
             habits.append(line)
 
-        elif any(word in l for word in task_words):
+        elif any(verb in l for verb in task_verbs):
             tasks.append(line)
 
         else:
