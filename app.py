@@ -21,6 +21,7 @@ task-to-action generator
 
 '''
 
+from openai import OpenAI
 from database import add_task, get_tasks, complete_task, delete_task, update_streak, get_streak, init_db
 import os
 import re
@@ -41,6 +42,7 @@ def extract_time(task):
     return None
 
 api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=api_key)
 
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
@@ -90,6 +92,45 @@ def extract_sentences(text):
                 results.append(part)
 
     return results
+
+
+def ai_organize_text(text):
+
+    prompt = f"""
+You are an assistant that organizes messy thoughts.
+
+Convert the text into three sections:
+
+Goals
+Tasks
+Habits
+
+Return the result in this format:
+
+Goals:
+- item
+
+Tasks:
+- item
+
+Habits:
+- item
+
+Text:
+{text}
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": "You organize messy thoughts into goals, tasks and habits."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
+
+    return response.choices[0].message.content
+
 
 def organize_text(text):
     goals = []
@@ -239,6 +280,9 @@ def calculate_stats(tasks):
 if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
 
     if brain_dump.strip():
+
+        ai_result = ai_organize_text(brain_dump)
+        st.markdown(ai_result)
 
         goals, tasks, habits = organize_text(brain_dump)
 
