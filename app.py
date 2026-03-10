@@ -372,6 +372,48 @@ def calculate_stats(tasks):
 
     return total, completed, rate
 
+def generate_daily_briefing(tasks):
+
+    total_tasks = len(tasks)
+    completed_tasks = sum(1 for _, _, done in tasks if done)
+    incomplete_tasks = [task for _, task, done in tasks if not done]
+
+    # determine greeting
+    hour = datetime.datetime.now().hour
+
+    if hour < 12:
+        greeting = "Good morning ☀️"
+    elif hour < 17:
+        greeting = "Good afternoon 🌤"
+    else:
+        greeting = "Good evening 🌙"
+
+    # completion rate
+    if total_tasks == 0:
+        completion_rate = 0
+    else:
+        completion_rate = round((completed_tasks / total_tasks) * 100)
+
+    # choose focus tasks
+    focus_tasks = incomplete_tasks[:3]
+
+    briefing = f"""
+{greeting}
+
+You have **{total_tasks} tasks** saved.  
+**{len(incomplete_tasks)} tasks** are still incomplete.
+
+Completion rate: **{completion_rate}%**
+
+**Suggested focus today:**
+"""
+
+    for task in focus_tasks:
+        briefing += f"\n• {task}"
+
+    return briefing
+
+
 
 # ============================================================
 # STREAMLIT UI
@@ -380,6 +422,12 @@ def calculate_stats(tasks):
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
 st.divider()
+saved_tasks = get_tasks()
+
+briefing = generate_daily_briefing(saved_tasks)
+
+st.subheader("🧠 Daily Briefing")
+st.markdown(briefing)
 
 # ------------------------------------------------------------
 
@@ -503,4 +551,3 @@ for task_id, task, completed in saved_tasks:
 
         st.write(f"{task} 🔥 {streak} days")
 
-        
