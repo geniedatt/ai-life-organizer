@@ -44,6 +44,9 @@ def organize_text(text):
     lines = text.split("\n")
 
     for line in lines:
+        line = line.strip()
+        if not line:
+            continue
         l = line.lower()
 
         if "learn" in l or "start" in l or "build" in l:
