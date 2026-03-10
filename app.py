@@ -21,11 +21,14 @@ task-to-action generator
 
 '''
 
-from openai import OpenAI
+
 from database import add_task, get_tasks, complete_task, delete_task, update_streak, get_streak, init_db
 import os
 import re
+from openai import OpenAI
 import streamlit as st
+
+st.write("Secrets:", st.secrets)
 
 init_db()
 
@@ -41,8 +44,11 @@ def extract_time(task):
 
     return None
 
-api_key = st.secrets["OPENAI_API_KEY"]
-client = OpenAI(api_key=api_key)
+if "OPENAI_API_KEY" in st.secrets:
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+else:
+    st.error("OpenAI API key not found in Streamlit secrets.")
+    st.stop()
 
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
