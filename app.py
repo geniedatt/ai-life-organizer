@@ -125,13 +125,13 @@ Text:
 """
 
     response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {"role": "system", "content": "You organize messy thoughts into goals, tasks and habits."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2
-    )
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You organize messy thoughts into goals, tasks and habits."},
+        {"role": "user", "content": prompt}
+    ],
+    temperature=0.2
+)
 
     return response.choices[0].message.content
 
@@ -285,8 +285,11 @@ if st.button("✨ Organize My Life", key="organize_button", use_container_width=
 
     if brain_dump.strip():
 
-        ai_result = ai_organize_text(brain_dump)
-        st.markdown(ai_result)
+        try:
+            ai_result = ai_organize_text(brain_dump)
+            st.markdown(ai_result)
+        except Exception:
+            st.warning("AI temporarily unavailable. Using local organizer.")
 
         goals, tasks, habits = organize_text(brain_dump)
 
