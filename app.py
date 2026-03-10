@@ -21,11 +21,10 @@ task-to-action generator
 
 '''
 
-from database import add_task, get_tasks, complete_task, delete_task, update_streak, get_streak
+from database import add_task, get_tasks, complete_task, delete_task, update_streak, get_streak, init_db
 import os
 import re
 import streamlit as st
-from database import init_db
 
 init_db()
 
@@ -126,10 +125,10 @@ def detect_time(task):
 
     t = task.lower()
 
-    if "morning" in t or "am" in t:
+    if "morning" in t or " am " in f" {t} ":
         return "morning"
 
-    if "afternoon" in t or "pm" in t:
+    if "afternoon" in t or " pm " in f" {t} ":
         return "afternoon"
 
     if "evening" in t or "tonight" in t:
@@ -215,10 +214,16 @@ def calculate_stats(tasks):
 
 if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
 
-    goals, tasks, habits = organize_text(brain_dump)
+    if brain_dump.strip():
 
-    for t in tasks:
-        add_task(t)
+        goals, tasks, habits = organize_text(brain_dump)
+
+        for t in tasks:
+            add_task(t)
+
+    else:
+        st.warning("Please enter something in the brain dump.")
+        goals, tasks, habits = [], [], []
 
     col1, col2, col3 = st.columns(3)
 
