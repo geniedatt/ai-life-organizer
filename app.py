@@ -20,7 +20,8 @@ productivity AI assistant
 task-to-action generator
 
 '''
-from database import add_task, get_tasks, complete_task, delete_task
+
+from database import add_task, get_tasks, complete_task, delete_task, update_streak, get_streak
 import os
 import re
 import streamlit as st
@@ -140,7 +141,7 @@ def prioritize_tasks(tasks):
     important = []
     later = []
 
-    for task_id, task, completed in tasks:
+    for _, task, _ in tasks:
 
         t = task.lower()
 
@@ -212,6 +213,7 @@ for task_id, task, completed in tasks:
         if st.checkbox(task, value=completed, key=f"task_{task_id}"):
             if not completed:
                 complete_task(task_id)
+                update_streak(task_id)
                 st.success("Task completed!")
                 st.rerun()
 
@@ -278,3 +280,16 @@ with col2:
 
 with col3:
     st.metric("🎯 Completion Rate", f"{completion_rate}%")
+
+st.subheader("🔥 Habit Streaks")
+
+saved_tasks = get_tasks()
+
+for task_id, task, completed in saved_tasks:
+
+    if "daily" in task.lower() or "every" in task.lower():
+
+        streak = get_streak(task_id)
+
+        st.write(f"{task} 🔥 {streak} days")
+

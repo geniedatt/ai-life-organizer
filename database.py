@@ -7,7 +7,8 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     task TEXT,
-    completed INTEGER DEFAULT 0
+    completed BOOLEAN,
+    streak INTEGER DEFAULT 0
 )
 """)
 conn.commit()
@@ -36,3 +37,17 @@ def complete_task(task_id):
 def delete_task(task_id):
     cursor.execute("DELETE FROM tasks WHERE id=?", (task_id,))
     conn.commit()
+
+def get_streak(task_id):
+
+    cursor.execute(
+        "SELECT streak FROM tasks WHERE id = ?",
+        (task_id,)
+    )
+
+    result = cursor.fetchone()
+
+    if result:
+        return result[0]
+
+    return 0
