@@ -22,6 +22,7 @@ task-to-action generator
 '''
 from database import add_task, get_tasks, complete_task, delete_task
 import os
+import re
 import streamlit as st
 
 api_key = os.getenv("OPENAI_API_KEY")
@@ -36,12 +37,45 @@ brain_dump = st.text_area(
     height=200
 )
 
+def extract_sentences(text):
+
+    sentences = re.split(r"[.\n]", text)
+
+    results = []
+
+    for sentence in sentences:
+
+        sentence = sentence.strip()
+
+        if not sentence:
+            continue
+
+        # remove filler phrases
+        sentence = re.sub(r"\b(tomorrow|today|tonight)\b", "", sentence, flags=re.IGNORECASE)
+        sentence = re.sub(r"\b(i need to|need to|i want to|remember to)\b", "", sentence, flags=re.IGNORECASE)
+
+        # split tasks
+        parts = re.split(r",|\band\b", sentence, flags=re.IGNORECASE)
+
+        for part in parts:
+
+            part = part.strip()
+
+            if part:
+                results.append(part)
+
+    return results
+
 def organize_text(text):
     goals = []
     tasks = []
     habits = []
 
-    lines = text.split("\n")
+    goal_words = ["learn", "start", "build", "launch", "create"]
+    habit_words = ["daily", "every", "routine", "habit", "gym"]
+    task_words = ["call", "buy", "clean", "finish", "send", "email"]
+
+    lines = extract_sentences(text)
 
     for line in lines:
         line = line.strip()
@@ -49,14 +83,14 @@ def organize_text(text):
             continue
         l = line.lower()
 
-        if "learn" in l or "start" in l or "build" in l:
+        if any(word in l for word in goal_words):
             goals.append(line)
 
-        elif "clean" in l or "call" in l or "buy" in l:
-            tasks.append(line)
-
-        elif "every" in l or "daily" in l or "gym" in l:
+        elif any(word in l for word in habit_words):
             habits.append(line)
+
+        elif any(word in l for word in task_words):
+            tasks.append(line)
 
         else:
             tasks.append(line)
