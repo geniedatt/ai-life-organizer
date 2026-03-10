@@ -190,7 +190,10 @@ def generate_daily_plan(tasks):
             daily.append(task)
 
         elif time_slot.startswith("time:"):
-            scheduled.append((time_slot.replace("time: ", ""), task))
+            time_value = time_slot.replace("time: ", "")
+            clean_task = re.sub(r"\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", "", task).strip()
+
+            scheduled.append((time_value, clean_task))
 
         else:
             unscheduled.append(task)
