@@ -155,6 +155,21 @@ def prioritize_tasks(tasks):
 
     return urgent, important, later
 
+
+def calculate_stats(tasks):
+
+    total_tasks = len(tasks)
+
+    completed_tasks = sum(1 for _, _, completed in tasks if completed)
+
+    if total_tasks == 0:
+        completion_rate = 0
+    else:
+        completion_rate = round((completed_tasks / total_tasks) * 100)
+
+    return total_tasks, completed_tasks, completion_rate
+
+
 if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
 
     goals, tasks, habits = organize_text(brain_dump)
@@ -247,3 +262,19 @@ with col3:
     for t in later:
         st.write("•", t)
 
+st.subheader("📊 Productivity Dashboard")
+
+saved_tasks = get_tasks()
+
+total_tasks, completed_tasks, completion_rate = calculate_stats(saved_tasks)
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("📋 Total Tasks", total_tasks)
+
+with col2:
+    st.metric("✅ Completed", completed_tasks)
+
+with col3:
+    st.metric("🎯 Completion Rate", f"{completion_rate}%")
