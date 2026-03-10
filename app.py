@@ -20,8 +20,7 @@ productivity AI assistant
 task-to-action generator
 
 '''
-from database import add_task, get_tasks, complete_task
-
+from database import add_task, get_tasks, complete_task, delete_task
 import os
 api_key = os.getenv("OPENAI_API_KEY")
 
@@ -107,22 +106,31 @@ if st.button("✨ Organize My Life", key="organize_button", use_container_width=
             st.write("•", h)
 
 
-st.subheader("🗂 Saved Tasks")
+st.subheader("📋 Saved Tasks")
 
-saved_tasks = get_tasks()
+tasks = get_tasks()
 
-for task in saved_tasks:
-    task_id = task[0]
-    task_text = task[1]
-    completed = task[2]
+completed_count = 0
+
+for task_id, task, completed in tasks:
+
+    col1, col2 = st.columns([4,1])
 
     if completed:
-        st.write(f"✅ {task_text}")
-    else:
-        if st.button(f"Complete: {task_text}", key=f"task_{task_id}"):
-            complete_task(task_id)
-            st.success("Task completed!")
-            st.experimental_rerun()
+        completed_count += 1
+
+    with col1:
+        if st.checkbox(task, value=completed, key=f"task_{task_id}"):
+            if not completed:
+                complete_task(task_id)
+                st.success("Task completed!")
+                st.rerun()
+
+    with col2:
+        if st.button("❌", key=f"delete_{task_id}"):
+            delete_task(task_id)
+            st.rerun()
+    
 
 st.subheader("🗓 Daily Plan")
 

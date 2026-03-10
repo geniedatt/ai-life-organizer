@@ -32,3 +32,7 @@ def get_tasks():
 def complete_task(task_id):
     cursor.execute("UPDATE tasks SET completed=1 WHERE id=?", (task_id,))
     conn.commit()
+
+def delete_task(task_id):
+    cursor.execute("DELETE FROM tasks WHERE id=?", (task_id,))
+    conn.commit()
