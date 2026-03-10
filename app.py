@@ -1,4 +1,10 @@
-'''
+# ============================================================
+# AI LIFE ORGANIZER
+# ============================================================
+
+"""
+Deployment Flow
+
 Your Computer
       ↓
 GitHub (store the code)
@@ -9,54 +15,54 @@ Flutter mobile wrapper
       ↓
 Google Play Store + Apple App Store
 
+This project can evolve into:
+• AI Life Planner
+• Productivity AI Assistant
+• Task-to-Action Generator
+"""
 
+# ============================================================
+# IMPORTS
+# ============================================================
 
-What has been built could evolve into something like:
-
-AI life planner
-
-productivity AI assistant
-
-task-to-action generator
-
-'''
-
-
-from database import add_task, get_tasks, complete_task, delete_task, update_streak, get_streak, init_db
 import os
 import re
-from openai import OpenAI
+import datetime
 import streamlit as st
+from openai import OpenAI
+
+from database import (
+    add_task,
+    get_tasks,
+    complete_task,
+    delete_task,
+    update_streak,
+    get_streak,
+    init_db
+)
+
+# ============================================================
+# INITIALIZATION
+# ============================================================
 
 init_db()
 
-client = OpenAI()
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+# ============================================================
+# UTILITY FUNCTIONS
+# ============================================================
 
 def extract_time(task):
-
     t = task.lower()
 
-    # detect specific clock times
-    time_match = re.search(r"\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", t)
+    match = re.search(r"\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", t)
 
-    if time_match:
-        return time_match.group()
+    if match:
+        return match.group()
 
     return None
 
-import os
-
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
-st.title("🧠 AI Life Organizer")
-st.caption("Turn your thoughts into organized goals, tasks, and habits.")
-st.divider()
-
-brain_dump = st.text_area(
-    "🧠 Brain Dump",
-    placeholder="Write everything on your mind...\n\nExample:\nCall mom\nBuy groceries\nStart learning Python\nGo to the gym daily",
-    height=200
-)
 
 def extract_sentences(text):
 
@@ -71,7 +77,6 @@ def extract_sentences(text):
         if not sentence:
             continue
 
-        # remove filler phrases
         sentence = re.sub(
             r"\b(tomorrow|today|tonight|later)\b",
             "",
@@ -89,7 +94,6 @@ def extract_sentences(text):
         parts = re.split(r",|\band\b", sentence, flags=re.IGNORECASE)
 
         for part in parts:
-
             part = part.strip()
 
             if part:
@@ -98,68 +102,145 @@ def extract_sentences(text):
     return results
 
 
+def detect_current_time_block():
+
+    hour = datetime.datetime.now().hour
+
+    if hour < 12:
+        return "morning"
+
+    elif hour < 17:
+        return "afternoon"
+
+    else:
+        return "evening"
+
+
+# ============================================================
+# AI FUNCTIONS
+# ============================================================
+
 def ai_organize_text(text):
 
     prompt = f"""
-You are an assistant that organizes messy thoughts.
+You organize messy thoughts.
 
-Convert the text into three sections:
+Convert the text into:
 
 Goals
 Tasks
 Habits
-
-Return the result in this format:
-
-Goals:
-- item
-
-Tasks:
-- item
-
-Habits:
-- item
 
 Text:
 {text}
 """
 
     response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": "You organize messy thoughts into goals, tasks and habits."},
-        {"role": "user", "content": prompt}
-    ],
-    temperature=0.2
-)
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You organize thoughts."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
 
     return response.choices[0].message.content
 
 
+def ai_schedule_tasks(task_list):
+
+    prompt = f"""
+Create a daily schedule between 8:00 and 20:00.
+
+Tasks:
+{task_list}
+
+Return format:
+
+09:00 Task
+10:00 Task
+"""
+
+    try:
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You create schedules."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.2
+        )
+
+        return response.choices[0].message.content
+
+    except Exception:
+        return None
+
+
+def generate_ai_reminders(tasks):
+
+    incomplete = [task for _, task, completed in tasks if not completed]
+
+    if not incomplete:
+        return None
+
+    prompt = f"""
+Send friendly reminders for these tasks:
+
+{incomplete}
+
+Return 1-2 short reminders.
+"""
+
+    try:
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You send reminders."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4
+        )
+
+        return response.choices[0].message.content
+
+    except Exception:
+        return None
+
+
+# ============================================================
+# ORGANIZATION LOGIC
+# ============================================================
+
 def organize_text(text):
+
     goals = []
     tasks = []
     habits = []
 
     goal_words = [
-    "learn","start","build","launch","create","develop","study","improve"
-]
+        "learn","start","build","launch","create",
+        "develop","study","improve"
+    ]
 
     habit_words = [
-    "daily","every","routine","habit","gym","exercise","meditate","read","workout"
-]
+        "daily","every","routine","habit",
+        "gym","exercise","meditate","read","workout"
+    ]
 
     task_verbs = [
-        "call","buy","clean","finish","send","email","schedule","pay","write",
-        "review","fix","prepare","submit","update","plan","organize","meet"
-]
+        "call","buy","clean","finish","send","email",
+        "schedule","pay","write","review","fix",
+        "prepare","submit","update","plan",
+        "organize","meet"
+    ]
 
     lines = extract_sentences(text)
 
     for line in lines:
-        line = line.strip()
-        if not line:
-            continue
+
         l = line.lower()
 
         if any(word in l for word in goal_words):
@@ -177,41 +258,9 @@ def organize_text(text):
     return goals, tasks, habits
 
 
-def ai_schedule_tasks(task_list):
-
-    prompt = f"""
-Create a simple daily schedule.
-
-Assign reasonable times between 8:00 and 20:00.
-
-Tasks:
-{task_list}
-
-If a task has a typical time (gym evening, calls afternoon, work morning),
-schedule it accordingly.
-
-Return format:
-
-09:00 Task
-10:00 Task
-"""
-
-    try:
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You create daily schedules."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.2
-        )
-
-        return response.choices[0].message.content
-
-    except Exception:
-        return None
-
+# ============================================================
+# DAILY PLANNING
+# ============================================================
 
 def detect_time(task):
 
@@ -229,14 +278,13 @@ def detect_time(task):
     if "tomorrow" in t:
         return "tomorrow"
 
-    if "daily" in t or "every day" in t:
+    if "daily" in t:
         return "daily"
 
-    # detect explicit clock time
-    specific_time = extract_time(task)
+    specific = extract_time(task)
 
-    if specific_time:
-        return f"time: {specific_time}"
+    if specific:
+        return f"time: {specific}"
 
     return "unscheduled"
 
@@ -253,33 +301,44 @@ def generate_daily_plan(tasks):
 
     for _, task, _ in tasks:
 
-        time_slot = detect_time(task)
+        slot = detect_time(task)
 
-        if time_slot == "morning":
+        if slot == "morning":
             morning.append(task)
 
-        elif time_slot == "afternoon":
+        elif slot == "afternoon":
             afternoon.append(task)
 
-        elif time_slot == "evening":
+        elif slot == "evening":
             evening.append(task)
 
-        elif time_slot == "tomorrow":
+        elif slot == "tomorrow":
             tomorrow.append(task)
 
-        elif time_slot == "daily":
+        elif slot == "daily":
             daily.append(task)
 
-        elif time_slot.startswith("time:"):
-            time_value = time_slot.replace("time: ", "")
-            clean_task = re.sub(r"\bat\s*\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", "", task).strip()
+        elif slot.startswith("time:"):
 
-            scheduled.append((time_value, clean_task))
+            time_value = slot.replace("time: ", "")
+
+            clean = re.sub(
+                r"\bat\s*\b\d{1,2}(:\d{2})?\s?(am|pm)?\b",
+                "",
+                task
+            ).strip()
+
+            scheduled.append((time_value, clean))
 
         else:
             unscheduled.append(task)
 
     return morning, afternoon, evening, tomorrow, daily, unscheduled, scheduled
+
+
+# ============================================================
+# ANALYTICS
+# ============================================================
 
 def prioritize_tasks(tasks):
 
@@ -291,10 +350,10 @@ def prioritize_tasks(tasks):
 
         t = task.lower()
 
-        if "today" in t or "asap" in t or "urgent" in t:
+        if "today" in t or "asap" in t:
             urgent.append(task)
 
-        elif "tomorrow" in t or "soon" in t:
+        elif "tomorrow" in t:
             important.append(task)
 
         else:
@@ -305,41 +364,51 @@ def prioritize_tasks(tasks):
 
 def calculate_stats(tasks):
 
-    total_tasks = len(tasks)
+    total = len(tasks)
 
-    completed_tasks = sum(1 for _, _, completed in tasks if completed)
+    completed = sum(1 for _, _, done in tasks if done)
 
-    if total_tasks == 0:
-        completion_rate = 0
-    else:
-        completion_rate = round((completed_tasks / total_tasks) * 100)
+    rate = 0 if total == 0 else round((completed / total) * 100)
 
-    return total_tasks, completed_tasks, completion_rate
+    return total, completed, rate
 
 
-import datetime
+# ============================================================
+# STREAMLIT UI
+# ============================================================
 
-def detect_current_time_block():
+st.title("🧠 AI Life Organizer")
+st.caption("Turn your thoughts into organized goals, tasks, and habits.")
+st.divider()
 
-    hour = datetime.datetime.now().hour
+# ------------------------------------------------------------
 
-    if hour < 12:
-        return "morning"
+saved_tasks = get_tasks()
 
-    elif hour < 17:
-        return "afternoon"
+reminders = generate_ai_reminders(saved_tasks)
 
-    else:
-        return "evening"
+if reminders:
+    st.subheader("🔔 AI Reminder")
+    st.info(reminders)
 
+# ------------------------------------------------------------
 
-if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
+brain_dump = st.text_area(
+    "🧠 Brain Dump",
+    height=200,
+    placeholder="Write everything on your mind..."
+)
+
+# ------------------------------------------------------------
+
+if st.button("✨ Organize My Life", use_container_width=True):
 
     if brain_dump.strip():
 
         try:
             ai_result = ai_organize_text(brain_dump)
             st.markdown(ai_result)
+
         except Exception:
             st.warning("AI temporarily unavailable. Using local organizer.")
 
@@ -349,42 +418,24 @@ if st.button("✨ Organize My Life", key="organize_button", use_container_width=
             add_task(t)
 
     else:
-        st.warning("Please enter something in the brain dump.")
-        goals, tasks, habits = [], [], []
+        st.warning("Please enter something.")
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.subheader("🎯 Goals")
-        for g in goals:
-            st.write("•", g)
-
-    with col2:
-        st.subheader("📋 Tasks")
-        for t in tasks:
-            st.write("•", t)
-
-    with col3:
-        st.subheader("🔁 Habits")
-        for h in habits:
-            st.write("•", h)
-
+# ------------------------------------------------------------
+# TASK LIST
+# ------------------------------------------------------------
 
 st.subheader("📋 Saved Tasks")
 
 tasks = get_tasks()
 
-completed_count = 0
-
 for task_id, task, completed in tasks:
 
     col1, col2 = st.columns([4,1])
 
-    if completed:
-        completed_count += 1
-
     with col1:
+
         if st.checkbox(task, value=completed, key=f"task_{task_id}"):
+
             if not completed:
 
                 complete_task(task_id)
@@ -393,14 +444,19 @@ for task_id, task, completed in tasks:
 
                 update_streak(task_id, time_block)
 
-                st.success("Task completed!")
                 st.rerun()
 
     with col2:
+
         if st.button("❌", key=f"delete_{task_id}"):
+
             delete_task(task_id)
+
             st.rerun()
-    
+
+# ------------------------------------------------------------
+# DAILY PLAN
+# ------------------------------------------------------------
 
 st.subheader("🗓 Daily Plan")
 
@@ -410,91 +466,34 @@ task_text = [task for _, task, _ in saved_tasks]
 
 ai_schedule = ai_schedule_tasks(task_text)
 
-
-morning, afternoon, evening, tomorrow, daily, unscheduled, scheduled = generate_daily_plan(saved_tasks)
-
-
 if ai_schedule:
 
     st.subheader("🤖 AI Daily Schedule")
 
     for line in ai_schedule.split("\n"):
+
         if line.strip():
             st.write("•", line)
 
-
-st.write("☀️ Morning")
-for t in morning:
-    st.write("•", t)
-
-st.write("🌤 Afternoon")
-for t in afternoon:
-    st.write("•", t)
-
-st.write("🌙 Evening")
-for t in evening:
-    st.write("•", t)
-
-st.write("📅 Tomorrow")
-for t in tomorrow:
-    st.write("•", t)
-
-st.write("🔁 Daily")
-for t in daily:
-    st.write("•", t)
-
-st.write("📌 Unscheduled")
-for t in unscheduled:
-    st.write("•", t)
-
-st.write("⏰ Scheduled")
-for time, task in scheduled:
-    st.write(f"{time} • {task}")
-    
-
-st.subheader("⚡ Task Priority")
-
-saved_tasks = get_tasks()
-
-urgent, important, later = prioritize_tasks(saved_tasks)
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown("### 🔥 Urgent")
-    for t in urgent:
-        st.write("•", t)
-
-with col2:
-    st.markdown("### ⚡ Important")
-    for t in important:
-        st.write("•", t)
-
-with col3:
-    st.markdown("### 🌱 Later")
-    for t in later:
-        st.write("•", t)
+# ------------------------------------------------------------
+# PRODUCTIVITY DASHBOARD
+# ------------------------------------------------------------
 
 st.subheader("📊 Productivity Dashboard")
 
-saved_tasks = get_tasks()
-
-total_tasks, completed_tasks, completion_rate = calculate_stats(saved_tasks)
+total, completed, rate = calculate_stats(saved_tasks)
 
 col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.metric("📋 Total Tasks", total_tasks)
+col1.metric("📋 Total Tasks", total)
+col2.metric("✅ Completed", completed)
+col3.metric("🎯 Completion Rate", f"{rate}%")
 
-with col2:
-    st.metric("✅ Completed", completed_tasks)
-
-with col3:
-    st.metric("🎯 Completion Rate", f"{completion_rate}%")
+# ------------------------------------------------------------
+# HABIT STREAKS
+# ------------------------------------------------------------
 
 st.subheader("🔥 Habit Streaks")
-
-saved_tasks = get_tasks()
 
 for task_id, task, completed in saved_tasks:
 
@@ -504,3 +503,4 @@ for task_id, task, completed in saved_tasks:
 
         st.write(f"{task} 🔥 {streak} days")
 
+        
