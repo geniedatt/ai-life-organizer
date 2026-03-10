@@ -134,6 +134,26 @@ def generate_daily_plan(tasks):
 
     return morning, afternoon, evening
 
+def prioritize_tasks(tasks):
+
+    urgent = []
+    important = []
+    later = []
+
+    for task_id, task, completed in tasks:
+
+        t = task.lower()
+
+        if "today" in t or "asap" in t or "urgent" in t:
+            urgent.append(task)
+
+        elif "tomorrow" in t or "soon" in t:
+            important.append(task)
+
+        else:
+            later.append(task)
+
+    return urgent, important, later
 
 if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
 
@@ -203,3 +223,27 @@ for t in afternoon:
 st.write("🌙 Evening")
 for t in evening:
     st.write("•", t)
+
+st.subheader("⚡ Task Priority")
+
+saved_tasks = get_tasks()
+
+urgent, important, later = prioritize_tasks(saved_tasks)
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("### 🔥 Urgent")
+    for t in urgent:
+        st.write("•", t)
+
+with col2:
+    st.markdown("### ⚡ Important")
+    for t in important:
+        st.write("•", t)
+
+with col3:
+    st.markdown("### 🌱 Later")
+    for t in later:
+        st.write("•", t)
+
