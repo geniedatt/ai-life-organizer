@@ -2,7 +2,7 @@ import sqlite3
 
 conn = sqlite3.connect("tasks.db", check_same_thread=False)
 
-# Create table
+# create table
 cursor = conn.cursor()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS tasks (
@@ -21,11 +21,18 @@ def add_task(task):
 
     clean_task = task.strip().lower()
 
-    cursor.execute("SELECT * FROM tasks WHERE LOWER(task)=?", (clean_task,))
+    cursor.execute(
+        "SELECT * FROM tasks WHERE LOWER(task)=?",
+        (clean_task,)
+    )
+
     exists = cursor.fetchone()
 
     if not exists:
-        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (clean_task,))
+        cursor.execute(
+            "INSERT INTO tasks (task) VALUES (?)",
+            (clean_task,)
+        )
         conn.commit()
 
 
@@ -33,7 +40,9 @@ def get_tasks():
 
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, task, completed FROM tasks")
+    cursor.execute(
+        "SELECT id, task, completed FROM tasks"
+    )
 
     return cursor.fetchall()
 
@@ -67,7 +76,7 @@ def update_streak(task_id):
     cursor = conn.cursor()
 
     cursor.execute(
-        "UPDATE tasks SET streak = streak + 1 WHERE id = ?",
+        "UPDATE tasks SET streak = streak + 1 WHERE id=?",
         (task_id,)
     )
 
@@ -79,7 +88,7 @@ def get_streak(task_id):
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT streak FROM tasks WHERE id = ?",
+        "SELECT streak FROM tasks WHERE id=?",
         (task_id,)
     )
 
