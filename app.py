@@ -30,6 +30,8 @@ import streamlit as st
 
 init_db()
 
+client = OpenAI()
+
 def extract_time(task):
 
     t = task.lower()
@@ -42,11 +44,9 @@ def extract_time(task):
 
     return None
 
-if "OPENAI_API_KEY" in st.secrets:
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-else:
-    st.error("OpenAI API key not found in Streamlit secrets.")
-    st.stop()
+import os
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
