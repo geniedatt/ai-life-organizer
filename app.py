@@ -209,6 +209,43 @@ Return 1-2 short reminders.
     except Exception:
         return None
 
+def generate_weekly_plan(tasks):
+
+    task_list = [task for _, task, completed in tasks if not completed]
+
+    if not task_list:
+        return None
+
+    prompt = f"""
+You are a productivity coach.
+
+From the list of tasks below, choose the 3 most important focus areas for the week.
+
+Tasks:
+{task_list}
+
+Return format:
+
+• task
+• task
+• task
+"""
+
+    try:
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You help people focus on the most important tasks."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3
+        )
+
+        return response.choices[0].message.content
+
+    except Exception:
+        return None
 
 # ============================================================
 # ORGANIZATION LOGIC
@@ -428,6 +465,13 @@ briefing = generate_daily_briefing(saved_tasks)
 
 st.subheader("🧠 Daily Briefing")
 st.markdown(briefing)
+
+weekly_plan = generate_weekly_plan(saved_tasks)
+
+if weekly_plan:
+
+    st.subheader("📅 Weekly AI Plan")
+    st.markdown(weekly_plan)
 
 # ------------------------------------------------------------
 
