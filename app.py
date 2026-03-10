@@ -236,7 +236,7 @@ def generate_daily_plan(tasks):
 
         elif time_slot.startswith("time:"):
             time_value = time_slot.replace("time: ", "")
-            clean_task = re.sub(r"\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", "", task).strip()
+            clean_task = re.sub(r"\bat\s*\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", "", task).strip()
 
             scheduled.append((time_value, clean_task))
 
