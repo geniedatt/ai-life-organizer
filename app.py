@@ -187,6 +187,9 @@ Assign reasonable times between 8:00 and 20:00.
 Tasks:
 {task_list}
 
+If a task has a typical time (gym evening, calls afternoon, work morning),
+schedule it accordingly.
+
 Return format:
 
 09:00 Task
@@ -314,6 +317,22 @@ def calculate_stats(tasks):
     return total_tasks, completed_tasks, completion_rate
 
 
+import datetime
+
+def detect_current_time_block():
+
+    hour = datetime.datetime.now().hour
+
+    if hour < 12:
+        return "morning"
+
+    elif hour < 17:
+        return "afternoon"
+
+    else:
+        return "evening"
+
+
 if st.button("✨ Organize My Life", key="organize_button", use_container_width=True):
 
     if brain_dump.strip():
@@ -367,8 +386,13 @@ for task_id, task, completed in tasks:
     with col1:
         if st.checkbox(task, value=completed, key=f"task_{task_id}"):
             if not completed:
+
                 complete_task(task_id)
-                update_streak(task_id)
+
+                time_block = detect_current_time_block()
+
+                update_streak(task_id, time_block)
+
                 st.success("Task completed!")
                 st.rerun()
 

@@ -10,13 +10,14 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        task TEXT,
-        completed INTEGER DEFAULT 0,
-        streak INTEGER DEFAULT 0
-    )
-    """)
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task TEXT,
+    completed INTEGER DEFAULT 0,
+    streak INTEGER DEFAULT 0,
+    preferred_time TEXT DEFAULT ''
+)
+""")
 
     conn.commit()
     conn.close()
@@ -75,15 +76,21 @@ def delete_task(task_id):
     conn.close()
 
 
-def update_streak(task_id):
+def update_streak(task_id, preferred_time=None):
 
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "UPDATE tasks SET streak = streak + 1 WHERE id=?",
-        (task_id,)
-    )
+    if preferred_time:
+        cursor.execute(
+            "UPDATE tasks SET streak = streak + 1, preferred_time=? WHERE id=?",
+            (preferred_time, task_id)
+        )
+    else:
+        cursor.execute(
+            "UPDATE tasks SET streak = streak + 1 WHERE id=?",
+            (task_id,)
+        )
 
     conn.commit()
     conn.close()
