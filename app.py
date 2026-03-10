@@ -28,6 +28,17 @@ import streamlit as st
 
 init_db()
 
+def extract_time(task):
+
+    t = task.lower()
+
+    # detect specific clock times
+    time_match = re.search(r"\b\d{1,2}(:\d{2})?\s?(am|pm)?\b", t)
+
+    if time_match:
+        return time_match.group()
+
+    return None
 
 api_key = os.getenv("OPENAI_API_KEY")
 
@@ -125,10 +136,10 @@ def detect_time(task):
 
     t = task.lower()
 
-    if "morning" in t or " am " in f" {t} ":
+    if "morning" in t:
         return "morning"
 
-    if "afternoon" in t or " pm " in f" {t} ":
+    if "afternoon" in t:
         return "afternoon"
 
     if "evening" in t or "tonight" in t:
@@ -139,6 +150,12 @@ def detect_time(task):
 
     if "daily" in t or "every day" in t:
         return "daily"
+
+    # detect explicit clock time
+    specific_time = extract_time(task)
+
+    if specific_time:
+        return f"time: {specific_time}"
 
     return "unscheduled"
 
@@ -151,6 +168,7 @@ def generate_daily_plan(tasks):
     tomorrow = []
     daily = []
     unscheduled = []
+    scheduled = []
 
     for _, task, _ in tasks:
 
@@ -171,10 +189,13 @@ def generate_daily_plan(tasks):
         elif time_slot == "daily":
             daily.append(task)
 
+        elif time_slot.startswith("time:"):
+            scheduled.append((time_slot.replace("time: ", ""), task))
+
         else:
             unscheduled.append(task)
 
-    return morning, afternoon, evening, tomorrow, daily, unscheduled
+    return morning, afternoon, evening, tomorrow, daily, unscheduled, scheduled
 
 def prioritize_tasks(tasks):
 
@@ -275,7 +296,7 @@ st.subheader("🗓 Daily Plan")
 saved_tasks = get_tasks()
 
 
-morning, afternoon, evening, tomorrow, daily, unscheduled = generate_daily_plan(saved_tasks)
+morning, afternoon, evening, tomorrow, daily, unscheduled, scheduled = generate_daily_plan(saved_tasks)
 
 st.write("☀️ Morning")
 for t in morning:
@@ -300,6 +321,10 @@ for t in daily:
 st.write("📌 Unscheduled")
 for t in unscheduled:
     st.write("•", t)
+
+st.write("⏰ Scheduled")
+for time, task in scheduled:
+    st.write(f"{time} • {task}")
     
 
 st.subheader("⚡ Task Priority")
