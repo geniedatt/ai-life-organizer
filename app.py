@@ -177,6 +177,39 @@ def organize_text(text):
     return goals, tasks, habits
 
 
+def ai_schedule_tasks(task_list):
+
+    prompt = f"""
+Create a simple daily schedule.
+
+Assign reasonable times between 8:00 and 20:00.
+
+Tasks:
+{task_list}
+
+Return format:
+
+09:00 Task
+10:00 Task
+"""
+
+    try:
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You create daily schedules."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.2
+        )
+
+        return response.choices[0].message.content
+
+    except Exception:
+        return None
+
+
 def detect_time(task):
 
     t = task.lower()
@@ -349,8 +382,22 @@ st.subheader("🗓 Daily Plan")
 
 saved_tasks = get_tasks()
 
+task_text = [task for _, task, _ in saved_tasks]
+
+ai_schedule = ai_schedule_tasks(task_text)
+
 
 morning, afternoon, evening, tomorrow, daily, unscheduled, scheduled = generate_daily_plan(saved_tasks)
+
+
+if ai_schedule:
+
+    st.subheader("🤖 AI Daily Schedule")
+
+    for line in ai_schedule.split("\n"):
+        if line.strip():
+            st.write("•", line)
+
 
 st.write("☀️ Morning")
 for t in morning:
