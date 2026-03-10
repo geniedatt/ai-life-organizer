@@ -28,8 +28,6 @@ import re
 from openai import OpenAI
 import streamlit as st
 
-st.write("Secrets:", st.secrets)
-
 init_db()
 
 def extract_time(task):
