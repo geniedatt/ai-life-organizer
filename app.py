@@ -41,7 +41,7 @@ def extract_time(task):
 
     return None
 
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
 st.title("🧠 AI Life Organizer")
