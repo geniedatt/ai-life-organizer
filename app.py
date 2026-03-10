@@ -146,8 +146,8 @@ def organize_text(text):
 ]
 
     habit_words = [
-        "daily","every","routine","habit","gym","exercise","meditate","read"
-    ]
+    "daily","every","routine","habit","gym","exercise","meditate","read","workout"
+]
 
     task_verbs = [
         "call","buy","clean","finish","send","email","schedule","pay","write",
