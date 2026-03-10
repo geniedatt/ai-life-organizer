@@ -25,6 +25,10 @@ from database import add_task, get_tasks, complete_task, delete_task, update_str
 import os
 import re
 import streamlit as st
+from database import init_db
+
+init_db()
+
 
 api_key = os.getenv("OPENAI_API_KEY")
 

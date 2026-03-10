@@ -2,24 +2,24 @@ import sqlite3
 
 
 def get_connection():
-    return sqlite3.connect("tasks.db", check_same_thread=False)
+    return sqlite3.connect("tasks.db")
 
 
-# create table
-conn = get_connection()
-cursor = conn.cursor()
+def init_db():
+    conn = get_connection()
+    cursor = conn.cursor()
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    task TEXT,
-    completed INTEGER DEFAULT 0,
-    streak INTEGER DEFAULT 0
-)
-""")
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task TEXT,
+        completed INTEGER DEFAULT 0,
+        streak INTEGER DEFAULT 0
+    )
+    """)
 
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
 
 
 def add_task(task):
@@ -29,20 +29,13 @@ def add_task(task):
 
     clean_task = task.strip().lower()
 
-    cursor.execute(
-        "SELECT * FROM tasks WHERE LOWER(task)=?",
-        (clean_task,)
-    )
-
+    cursor.execute("SELECT * FROM tasks WHERE LOWER(task)=?", (clean_task,))
     exists = cursor.fetchone()
 
     if not exists:
-        cursor.execute(
-            "INSERT INTO tasks (task) VALUES (?)",
-            (clean_task,)
-        )
-        conn.commit()
+        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (clean_task,))
 
+    conn.commit()
     conn.close()
 
 
@@ -51,9 +44,7 @@ def get_tasks():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT id, task, completed FROM tasks"
-    )
+    cursor.execute("SELECT id, task, completed FROM tasks")
 
     tasks = cursor.fetchall()
 
@@ -67,10 +58,7 @@ def complete_task(task_id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "UPDATE tasks SET completed=1 WHERE id=?",
-        (task_id,)
-    )
+    cursor.execute("UPDATE tasks SET completed=1 WHERE id=?", (task_id,))
 
     conn.commit()
     conn.close()
@@ -81,10 +69,7 @@ def delete_task(task_id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "DELETE FROM tasks WHERE id=?",
-        (task_id,)
-    )
+    cursor.execute("DELETE FROM tasks WHERE id=?", (task_id,))
 
     conn.commit()
     conn.close()
