@@ -1,9 +1,14 @@
 import sqlite3
 
-conn = sqlite3.connect("tasks.db", check_same_thread=False)
+
+def get_connection():
+    return sqlite3.connect("tasks.db", check_same_thread=False)
+
 
 # create table
+conn = get_connection()
 cursor = conn.cursor()
+
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,11 +17,14 @@ CREATE TABLE IF NOT EXISTS tasks (
     streak INTEGER DEFAULT 0
 )
 """)
+
 conn.commit()
+conn.close()
 
 
 def add_task(task):
 
+    conn = get_connection()
     cursor = conn.cursor()
 
     clean_task = task.strip().lower()
@@ -35,20 +43,28 @@ def add_task(task):
         )
         conn.commit()
 
+    conn.close()
+
 
 def get_tasks():
 
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         "SELECT id, task, completed FROM tasks"
     )
 
-    return cursor.fetchall()
+    tasks = cursor.fetchall()
+
+    conn.close()
+
+    return tasks
 
 
 def complete_task(task_id):
 
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -57,10 +73,12 @@ def complete_task(task_id):
     )
 
     conn.commit()
+    conn.close()
 
 
 def delete_task(task_id):
 
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -69,10 +87,12 @@ def delete_task(task_id):
     )
 
     conn.commit()
+    conn.close()
 
 
 def update_streak(task_id):
 
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -81,10 +101,12 @@ def update_streak(task_id):
     )
 
     conn.commit()
+    conn.close()
 
 
 def get_streak(task_id):
 
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -93,6 +115,8 @@ def get_streak(task_id):
     )
 
     result = cursor.fetchone()
+
+    conn.close()
 
     if result:
         return result[0]
