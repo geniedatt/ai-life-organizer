@@ -247,6 +247,83 @@ Return format:
     except Exception:
         return None
 
+def categorize_tasks(tasks):
+
+    categories = {
+        "Work": [],
+        "Health": [],
+        "Learning": [],
+        "Finance": [],
+        "Relationships": [],
+        "Personal": []
+    }
+
+    for _, task, _ in tasks:
+
+        t = task.lower()
+
+        if any(word in t for word in ["report","project","meeting","email","work"]):
+            categories["Work"].append(task)
+
+        elif any(word in t for word in ["gym","exercise","run","workout","meditate"]):
+            categories["Health"].append(task)
+
+        elif any(word in t for word in ["learn","study","course","read","practice"]):
+            categories["Learning"].append(task)
+
+        elif any(word in t for word in ["pay","bill","finance","budget","tax"]):
+            categories["Finance"].append(task)
+
+        elif any(word in t for word in ["call","family","mom","dad","friend"]):
+            categories["Relationships"].append(task)
+
+        else:
+            categories["Personal"].append(task)
+
+    return categories
+
+
+def generate_goal_actions(goals):
+
+    if not goals:
+        return None
+
+    prompt = f"""
+You are a life coach.
+
+Convert these life goals into small weekly action steps.
+
+Goals:
+{goals}
+
+Return format:
+
+Goal: goal name
+Actions:
+• action
+• action
+"""
+
+    try:
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You help people break goals into actionable steps."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3
+        )
+
+        return response.choices[0].message.content
+
+    except Exception:
+        return None
+    
+
+
+
+
 # ============================================================
 # ORGANIZATION LOGIC
 # ============================================================
@@ -459,6 +536,9 @@ Completion rate: **{completion_rate}%**
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
 st.divider()
+
+goal_actions = None
+
 saved_tasks = get_tasks()
 
 briefing = generate_daily_briefing(saved_tasks)
@@ -472,6 +552,11 @@ if weekly_plan:
 
     st.subheader("📅 Weekly AI Plan")
     st.markdown(weekly_plan)
+
+if "goal_actions" in st.session_state and st.session_state.goal_actions:
+
+    st.subheader("🎯 Goal Action Plan")
+    st.markdown(st.session_state.goal_actions)
 
 # ------------------------------------------------------------
 
@@ -505,6 +590,7 @@ if st.button("✨ Organize My Life", use_container_width=True):
             st.warning("AI temporarily unavailable. Using local organizer.")
 
         goals, tasks, habits = organize_text(brain_dump)
+        st.session_state.goal_actions = generate_goal_actions(goals)
 
         for t in tasks:
             add_task(t)
@@ -580,6 +666,20 @@ col1, col2, col3 = st.columns(3)
 col1.metric("📋 Total Tasks", total)
 col2.metric("✅ Completed", completed)
 col3.metric("🎯 Completion Rate", f"{rate}%")
+
+st.subheader("🧭 Life Balance")
+
+categories = categorize_tasks(saved_tasks)
+
+for category, items in categories.items():
+
+    st.markdown(f"### {category}")
+
+    if items:
+        for task in items:
+            st.write("•", task)
+    else:
+        st.write("No tasks")
 
 # ------------------------------------------------------------
 # HABIT STREAKS
