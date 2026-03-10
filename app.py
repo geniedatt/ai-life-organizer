@@ -22,10 +22,9 @@ task-to-action generator
 '''
 from database import add_task, get_tasks, complete_task, delete_task
 import os
-api_key = os.getenv("OPENAI_API_KEY")
-
 import streamlit as st
 
+api_key = os.getenv("OPENAI_API_KEY")
 
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
