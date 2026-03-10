@@ -118,22 +118,60 @@ def organize_text(text):
     return goals, tasks, habits
 
 
+def detect_time(task):
+
+    t = task.lower()
+
+    if "morning" in t or "am" in t:
+        return "morning"
+
+    if "afternoon" in t or "pm" in t:
+        return "afternoon"
+
+    if "evening" in t or "tonight" in t:
+        return "evening"
+
+    if "tomorrow" in t:
+        return "tomorrow"
+
+    if "daily" in t or "every day" in t:
+        return "daily"
+
+    return "unscheduled"
+
+
 def generate_daily_plan(tasks):
+
     morning = []
     afternoon = []
     evening = []
+    tomorrow = []
+    daily = []
+    unscheduled = []
 
-    for i, task in enumerate(tasks):
-        task_text = task[1]
+    for _, task, _ in tasks:
 
-        if i % 3 == 0:
-            morning.append(task_text)
-        elif i % 3 == 1:
-            afternoon.append(task_text)
+        time_slot = detect_time(task)
+
+        if time_slot == "morning":
+            morning.append(task)
+
+        elif time_slot == "afternoon":
+            afternoon.append(task)
+
+        elif time_slot == "evening":
+            evening.append(task)
+
+        elif time_slot == "tomorrow":
+            tomorrow.append(task)
+
+        elif time_slot == "daily":
+            daily.append(task)
+
         else:
-            evening.append(task_text)
+            unscheduled.append(task)
 
-    return morning, afternoon, evening
+    return morning, afternoon, evening, tomorrow, daily, unscheduled
 
 def prioritize_tasks(tasks):
 
@@ -227,7 +265,8 @@ st.subheader("🗓 Daily Plan")
 
 saved_tasks = get_tasks()
 
-morning, afternoon, evening = generate_daily_plan(saved_tasks)
+
+morning, afternoon, evening, tomorrow, daily, unscheduled = generate_daily_plan(saved_tasks)
 
 st.write("☀️ Morning")
 for t in morning:
@@ -240,6 +279,19 @@ for t in afternoon:
 st.write("🌙 Evening")
 for t in evening:
     st.write("•", t)
+
+st.write("📅 Tomorrow")
+for t in tomorrow:
+    st.write("•", t)
+
+st.write("🔁 Daily")
+for t in daily:
+    st.write("•", t)
+
+st.write("📌 Unscheduled")
+for t in unscheduled:
+    st.write("•", t)
+    
 
 st.subheader("⚡ Task Priority")
 
