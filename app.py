@@ -26,7 +26,6 @@ api_key = os.getenv("OPENAI_API_KEY")
 
 import streamlit as st
 
-print(add_task)
 
 st.title("🧠 AI Life Organizer")
 st.caption("Turn your thoughts into organized goals, tasks, and habits.")
