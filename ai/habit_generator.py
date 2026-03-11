@@ -4,14 +4,21 @@ from ai.ai_engine import ai_chat
 def generate_habits(strategy_text):
 
     prompt = f"""
-From the following life strategy, extract daily habits.
+From the strategy below, extract ONLY true DAILY HABITS.
 
 Rules:
-- Return ONLY habits
+- Habits must be repeatable daily behaviors
+- Max 6 habits
 - One habit per line
 - No numbering
 - No explanations
-- Keep habits short and repeatable
+- Do NOT include one-time tasks or projects
+
+Good examples:
+exercise 30 minutes
+drink 2 liters of water
+study AI for 1 hour
+practice mindfulness
 
 Strategy:
 {strategy_text}
@@ -19,7 +26,7 @@ Strategy:
 
     result = ai_chat(
         prompt,
-        "You are an expert habit designer that extracts daily habits from strategies."
+        "You are an expert habit designer who extracts only essential daily habits."
     )
 
     return result
