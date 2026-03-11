@@ -1,27 +1,50 @@
 import sqlite3
 
 
+# -----------------------------
+# DATABASE CONNECTION
+# -----------------------------
+
 def get_connection():
     return sqlite3.connect("tasks.db")
 
 
+# -----------------------------
+# INITIALIZE DATABASE
+# -----------------------------
+
 def init_db():
+
     conn = get_connection()
     cursor = conn.cursor()
 
+    # TASKS TABLE
     cursor.execute("""
-CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    task TEXT,
-    completed INTEGER DEFAULT 0,
-    streak INTEGER DEFAULT 0,
-    preferred_time TEXT DEFAULT ''
-)
-""")
+    CREATE TABLE IF NOT EXISTS tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task TEXT,
+        completed INTEGER DEFAULT 0,
+        streak INTEGER DEFAULT 0,
+        preferred_time TEXT DEFAULT ''
+    )
+    """)
+
+    # HABITS TABLE
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS habits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        habit TEXT,
+        streak INTEGER DEFAULT 0
+    )
+    """)
 
     conn.commit()
     conn.close()
 
+
+# -----------------------------
+# TASK FUNCTIONS
+# -----------------------------
 
 def add_task(task):
 
@@ -76,6 +99,10 @@ def delete_task(task_id):
     conn.close()
 
 
+# -----------------------------
+# STREAK SYSTEM
+# -----------------------------
+
 def update_streak(task_id, preferred_time=None):
 
     conn = get_connection()
@@ -116,15 +143,25 @@ def get_streak(task_id):
     return 0
 
 
+# -----------------------------
+# HABIT FUNCTIONS
+# -----------------------------
+
 def add_habit(habit):
 
-    conn = sqlite3.connect("life.db")
-    c = conn.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    c.execute(
-        "INSERT INTO habits (habit, streak) VALUES (?, 0)",
-        (habit,)
-    )
+    clean_habit = habit.strip().lower()
+
+    cursor.execute("SELECT * FROM habits WHERE LOWER(habit)=?", (clean_habit,))
+    exists = cursor.fetchone()
+
+    if not exists:
+        cursor.execute(
+            "INSERT INTO habits (habit, streak) VALUES (?, 0)",
+            (clean_habit,)
+        )
 
     conn.commit()
     conn.close()
@@ -132,12 +169,12 @@ def add_habit(habit):
 
 def get_habits():
 
-    conn = sqlite3.connect("life.db")
-    c = conn.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    c.execute("SELECT id, habit FROM habits")
+    cursor.execute("SELECT id, habit, streak FROM habits")
 
-    habits = c.fetchall()
+    habits = cursor.fetchall()
 
     conn.close()
 
