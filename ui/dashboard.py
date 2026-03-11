@@ -1,8 +1,8 @@
+from ai.habit_generator import generate_habits_from_strategy
+from database import add_habit, get_habits, add_task, get_tasks, get_habits
 from ai.task_generator import generate_tasks_from_strategy
-from database import add_task
 from ai.life_strategy import generate_life_strategy
 from ai.planner import weekly_plan
-from database import get_tasks
 import streamlit as st
 
 
@@ -13,6 +13,16 @@ def dashboard_page():
     tasks = get_tasks()
 
     st.write(f"You have {len(tasks)} tasks.")
+
+    habits = get_habits()
+
+    if habits:
+
+        st.subheader("🔥 Daily Habits")
+
+        for habit in habits:
+
+            st.checkbox(habit[1], key=habit[0])
 
     # -----------------------------
     # AI LIFE STRATEGY SECTION
@@ -45,6 +55,15 @@ def dashboard_page():
 
                         if clean_task:
                             add_task(clean_task)
+
+                            habits = generate_habits_from_strategy(strategy)
+
+                            for habit in habits:
+
+                                clean_habit = habit.replace("-", "").strip()
+
+                                if clean_habit:
+                                    add_habit(clean_habit)
 
         else:
             st.warning("Please describe your goals first.")

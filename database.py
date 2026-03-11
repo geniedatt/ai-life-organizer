@@ -114,3 +114,31 @@ def get_streak(task_id):
         return result[0]
 
     return 0
+
+
+def add_habit(habit):
+
+    conn = sqlite3.connect("life.db")
+    c = conn.cursor()
+
+    c.execute(
+        "INSERT INTO habits (habit, streak) VALUES (?, 0)",
+        (habit,)
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_habits():
+
+    conn = sqlite3.connect("life.db")
+    c = conn.cursor()
+
+    c.execute("SELECT id, habit FROM habits")
+
+    habits = c.fetchall()
+
+    conn.close()
+
+    return habits
