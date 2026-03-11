@@ -1,14 +1,23 @@
+from ai.goal_parser import extract_goals
+import streamlit as st
 import streamlit as st
 
 def goals_page():
 
-    st.subheader("🎯 Goals")
+    st.subheader("🎯 Top Life Goals")
 
-    if "goal_actions" in st.session_state:
+    if "life_strategy" in st.session_state:
 
-        st.markdown(st.session_state.goal_actions)
+        goals = extract_goals(st.session_state.life_strategy)
+
+        if goals:
+
+            for goal in goals:
+                st.markdown(f"- {goal}")
+
+        else:
+            st.info("No goals detected yet.")
 
     else:
-
-        st.info("No goals yet. Use the Brain Dump.")
+        st.info("Generate a life strategy first.")
 
