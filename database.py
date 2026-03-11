@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date
+from datetime import date, datetime, timedelta
 
 
 # -----------------------------
@@ -55,11 +55,7 @@ def init_db():
     )
     """)
 
-    conn.commit()
-    conn.close()
-
-    # Habit log table (tracks each day completed)
-
+    # HABIT LOGS TABLE (for real streak tracking)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS habit_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,6 +64,8 @@ def init_db():
     )
     """)
 
+    conn.commit()
+    conn.close()
 
 
 # -----------------------------
@@ -247,6 +245,68 @@ def update_habit_streak(habit_id):
     conn.close()
 
 
+# -----------------------------
+# HABIT LOGGING SYSTEM
+# -----------------------------
+
+def log_habit_completion(habit_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    today = date.today().isoformat()
+
+    # Prevent duplicate logs for same day
+    cursor.execute(
+        "SELECT * FROM habit_logs WHERE habit_id=? AND completed_date=?",
+        (habit_id, today)
+    )
+
+    exists = cursor.fetchone()
+
+    if not exists:
+
+        cursor.execute("""
+        INSERT INTO habit_logs (habit_id, completed_date)
+        VALUES (?, ?)
+        """, (habit_id, today))
+
+    conn.commit()
+    conn.close()
+
+
+def calculate_streak(habit_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT completed_date
+    FROM habit_logs
+    WHERE habit_id=?
+    ORDER BY completed_date DESC
+    """, (habit_id,))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    if not rows:
+        return 0
+
+    streak = 0
+    today = datetime.today().date()
+
+    for row in rows:
+
+        log_date = datetime.strptime(row[0], "%Y-%m-%d").date()
+
+        if log_date == today - timedelta(days=streak):
+            streak += 1
+        else:
+            break
+
+    return streak
+
 
 # -----------------------------
 # WEEKLY PLAN STORAGE
@@ -319,55 +379,3 @@ def get_memory():
     conn.close()
 
     return [r[0] for r in rows]
-
-def log_habit_completion(habit_id):
-
-    conn = sqlite3.connect("tasks.db")
-    cursor = conn.cursor()
-
-    today = date.today().isoformat()
-
-    cursor.execute("""
-    INSERT INTO habit_logs (habit_id, completed_date)
-    VALUES (?, ?)
-    """, (habit_id, today))
-
-    conn.commit()
-    conn.close()
-
-
-def calculate_streak(habit_id):
-
-    conn = sqlite3.connect("tasks.db")
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    SELECT completed_date
-    FROM habit_logs
-    WHERE habit_id=?
-    ORDER BY completed_date DESC
-    """, (habit_id,))
-
-    rows = cursor.fetchall()
-    conn.close()
-
-    if not rows:
-        return 0
-
-    from datetime import datetime, timedelta
-
-    streak = 0
-    today = datetime.today().date()
-
-    for row in rows:
-
-        log_date = datetime.strptime(row[0], "%Y-%m-%d").date()
-
-        if log_date == today - timedelta(days=streak):
-
-            streak += 1
-
-        else:
-            break
-
-    return streak
