@@ -221,6 +221,21 @@ def get_habits():
     return habits
 
 
+def update_habit_streak(habit_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "UPDATE habits SET streak = streak + 1 WHERE id=?",
+        (habit_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+
+
 # -----------------------------
 # WEEKLY PLAN STORAGE
 # -----------------------------
