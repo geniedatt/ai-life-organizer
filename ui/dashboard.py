@@ -19,17 +19,17 @@ def dashboard_page():
 
     st.write(f"You have {len(tasks)} tasks.")
 
-    if tasks or habits:
+    # Generate briefing once per session
+    if "daily_briefing" not in st.session_state:
 
-        if "daily_briefing" not in st.session_state:
+        with st.spinner("Preparing your daily briefing..."):
 
-            with st.spinner("Preparing your daily briefing..."):
+            briefing = generate_daily_briefing(tasks, habits)
 
-                briefing = generate_daily_briefing(tasks, habits)
+            if briefing:
+                st.session_state.daily_briefing = briefing
 
-                if briefing:
-                    st.session_state.daily_briefing = briefing
-
+    if "daily_briefing" in st.session_state:
         st.markdown(st.session_state.daily_briefing)
 
     # -----------------------------
@@ -56,9 +56,6 @@ def dashboard_page():
 
         else:
             st.warning("Please describe your goals first.")
-
-    else:
-        st.warning("Please describe your goals first.")
 
     # -----------------------------
     # DISPLAY LIFE STRATEGY
