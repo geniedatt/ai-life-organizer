@@ -16,6 +16,46 @@ def habits_page():
     habits = sorted(habits, key=lambda x: x[2], reverse=True)
 
     # -----------------------------
+    # HABIT OF THE WEEK
+    # -----------------------------
+
+    top_habit = habits[0]
+
+    st.subheader("🏆 Habit of the Week")
+
+    st.success(
+        f"{top_habit[1]}\n\n"
+        f"You're on a **{top_habit[2]} day streak**. Keep the momentum going!"
+    )
+
+    st.divider()
+
+    # -----------------------------
+    # AI HABIT COACH
+    # -----------------------------
+
+    st.subheader("🤖 AI Habit Coaching")
+
+    weak_habits = [h for h in habits if h[2] == 0]
+
+    if weak_habits:
+
+        habit = weak_habits[0]
+
+        st.warning(
+            f"You haven't started **{habit[1]}** yet.\n\n"
+            "Try doing a **5-minute version today** to kickstart the streak."
+        )
+
+    else:
+
+        st.info(
+            "Great job! All your habits have active streaks. Keep building momentum."
+        )
+
+    st.divider()
+
+    # -----------------------------
     # TOP 3 HABITS
     # -----------------------------
 
