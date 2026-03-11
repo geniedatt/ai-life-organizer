@@ -54,6 +54,12 @@ def dashboard_page():
 
         st.subheader("🔥 Daily Habits")
 
+        col1, col2, col3 = st.columns(3)
+
+        health_keywords = ["exercise", "water", "health", "stretch", "sleep", "workout"]
+        work_keywords = ["business", "code", "project", "mvp", "software", "build"]
+        learning_keywords = ["study", "learn", "read", "course", "ai"]
+
         for habit in habits:
 
             habit_id = habit[0]
@@ -62,10 +68,28 @@ def dashboard_page():
 
             label = f"{habit_name} — 🔥 {streak} day streak"
 
-            completed = st.checkbox(label, key=f"habit_{habit_id}")
+            # Categorize habit
+            lower = habit_name.lower()
+
+            if any(k in lower for k in health_keywords):
+
+                completed = col1.checkbox(label, key=f"habit_{habit_id}")
+
+            elif any(k in lower for k in learning_keywords):
+
+                completed = col3.checkbox(label, key=f"habit_{habit_id}")
+
+            else:
+
+                completed = col2.checkbox(label, key=f"habit_{habit_id}")
 
             if completed:
                 update_habit_streak(habit_id)
+
+        col1.markdown("### 🏃 Health")
+        col2.markdown("### 💼 Work")
+        col3.markdown("### 🧠 Learning")
+
 
     # -----------------------------
     # AI LIFE STRATEGY
