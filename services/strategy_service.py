@@ -7,28 +7,51 @@ from database import add_task, add_habit
 
 def build_full_strategy(brain_dump):
 
-    # Generate full AI strategy
     strategy = generate_life_strategy(brain_dump)
 
     if not strategy:
         return None
 
-    # Generate tasks
+    # -----------------------------
+    # EXTRACT TASKS
+    # -----------------------------
+
     tasks = generate_tasks(strategy)
 
     if tasks:
-        for t in tasks.split("\n"):
-            clean = t.strip("-• ").strip()
-            if clean:
+        lines = tasks.split("\n")
+
+        for line in lines:
+
+            clean = line.strip()
+
+            if not clean:
+                continue
+
+            clean = clean.replace("•", "").replace("-", "").strip()
+
+            if len(clean) > 3:
                 add_task(clean)
 
-    # Generate habits
+    # -----------------------------
+    # EXTRACT HABITS
+    # -----------------------------
+
     habits = generate_habits(strategy)
 
     if habits:
-        for h in habits.split("\n"):
-            clean = h.strip("-• ").strip()
-            if clean:
+        lines = habits.split("\n")
+
+        for line in lines:
+
+            clean = line.strip()
+
+            if not clean:
+                continue
+
+            clean = clean.replace("•", "").replace("-", "").strip()
+
+            if len(clean) > 3:
                 add_habit(clean)
 
     return strategy
