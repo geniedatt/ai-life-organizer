@@ -1,6 +1,10 @@
 import streamlit as st
-from database import get_habits, log_habit_completion, calculate_streak
-
+from database import (
+    get_habits,
+    log_habit_completion,
+    calculate_streak,
+    get_habit_activity
+)
 
 def habits_page():
 
@@ -32,7 +36,15 @@ def habits_page():
         })
 
     # Sort by real streak
-    habit_data = sorted(habit_data, key=lambda x: x["streak"], reverse=True)
+    habit_data = sorted(
+        habit_data,
+        key=lambda x: x["streak"],
+        reverse=True
+    )
+
+    if not habit_data:
+        st.warning("No habit data available.")
+        return
 
     # -----------------------------
     # HABIT OF THE WEEK
@@ -84,13 +96,12 @@ def habits_page():
 
         habit_id = habit["id"]
         habit_name = habit["name"]
+        streak = habit["streak"]
 
         checked = st.checkbox(habit_name, key=f"habit_{habit_id}")
 
         if checked:
             log_habit_completion(habit_id)
-
-        streak = calculate_streak(habit_id)
 
         st.caption(f"🔥 {streak} day streak")
 
@@ -123,13 +134,13 @@ def habits_page():
             value=f"🔥 {bronze['streak']} days"
         )
 
-        st.divider()
-
         remaining = habit_data[3:]
 
     else:
 
         remaining = habit_data
+
+    st.divider()
 
     # -----------------------------
     # FULL LEADERBOARD
@@ -137,7 +148,9 @@ def habits_page():
 
     st.subheader("📊 Full Habit Rankings")
 
-    for i, habit in enumerate(remaining, start=4):
+    start_rank = 4 if len(habit_data) >= 3 else 1
+
+    for i, habit in enumerate(remaining, start=start_rank):
 
         st.markdown(
             f"**{i}. {habit['name']}** — 🔥 {habit['streak']} days"

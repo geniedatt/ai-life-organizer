@@ -379,3 +379,20 @@ def get_memory():
     conn.close()
 
     return [r[0] for r in rows]
+
+
+def get_habit_activity(habit_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT completed_date
+    FROM habit_logs
+    WHERE habit_id=?
+    """, (habit_id,))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return {r[0] for r in rows}
