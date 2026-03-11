@@ -30,7 +30,7 @@ def dashboard_page():
                 st.session_state.daily_briefing = briefing
 
     if "daily_briefing" in st.session_state:
-        st.markdown(st.session_state.daily_briefing)
+        st.markdown(st.session_state.daily_briefing.replace("Today's Focus:", "Today's Focus:\n"))
 
     # -----------------------------
     # AI LIFE STRATEGY
