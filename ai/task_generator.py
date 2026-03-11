@@ -1,27 +1,25 @@
 from ai.ai_engine import ai_chat
 
 
-def generate_tasks_from_strategy(strategy):
+def generate_tasks(strategy_text):
 
     prompt = f"""
-From the life strategy below, extract actionable tasks the user should complete.
+From the following life strategy, extract a clean list of actionable tasks.
 
-Return ONLY a list of short tasks.
+Rules:
+- Return ONLY tasks
+- One task per line
+- No explanations
+- No numbering
+- Keep tasks practical
 
-Example format:
-
-- Go for a 20 minute walk
-- Brainstorm 5 business ideas
-- Call mom
-- Prepare a healthy lunch
-
-Life Strategy:
-{strategy}
+Strategy:
+{strategy_text}
 """
 
-    tasks = ai_chat(prompt, "You extract practical tasks from plans.")
+    result = ai_chat(
+        prompt,
+        "You are an expert productivity planner that converts strategies into concrete tasks."
+    )
 
-    if tasks:
-        return tasks.split("\n")
-    else:
-        return []
+    return result

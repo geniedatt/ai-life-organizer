@@ -1,27 +1,25 @@
 from ai.ai_engine import ai_chat
 
 
-def generate_habits_from_strategy(strategy):
+def generate_habits(strategy_text):
 
     prompt = f"""
-From the life strategy below, extract daily habits the user should practice.
+From the following life strategy, extract daily habits.
 
-Return ONLY simple daily habits.
+Rules:
+- Return ONLY habits
+- One habit per line
+- No numbering
+- No explanations
+- Keep habits short and repeatable
 
-Example format:
-
-- Drink a glass of water after waking up
-- Exercise for 20 minutes
-- Write down 3 business ideas
-- Send a message to a family member
-
-Life Strategy:
-{strategy}
+Strategy:
+{strategy_text}
 """
 
-    habits = ai_chat(prompt, "You extract positive daily habits.")
+    result = ai_chat(
+        prompt,
+        "You are an expert habit designer that extracts daily habits from strategies."
+    )
 
-    if habits:
-        return habits.split("\n")
-    else:
-        return []
+    return result
