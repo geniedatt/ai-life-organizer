@@ -1,10 +1,8 @@
 import streamlit as st
 
-from database import get_tasks, add_task, get_habits, add_habit
-from ai.life_strategy import generate_life_strategy
-from ai.task_generator import generate_tasks_from_strategy
-from ai.habit_generator import generate_habits_from_strategy
+from database import get_tasks, get_habits
 from ai.planner import weekly_plan
+from services.strategy_service import build_full_strategy
 
 
 def dashboard_page():
@@ -43,40 +41,16 @@ def dashboard_page():
 
             with st.spinner("Generating your AI life strategy..."):
 
-                strategy = generate_life_strategy(life_input)
+                strategy = build_full_strategy(life_input)
 
                 if strategy:
-
                     st.session_state.life_strategy = strategy
-
-                    # -----------------------------
-                    # GENERATE TASKS
-                    # -----------------------------
-
-                    tasks_generated = generate_tasks_from_strategy(strategy)
-
-                    for task in tasks_generated:
-
-                        clean_task = task.replace("-", "").strip()
-
-                        if clean_task:
-                            add_task(clean_task)
-
-                    # -----------------------------
-                    # GENERATE HABITS
-                    # -----------------------------
-
-                    habits_generated = generate_habits_from_strategy(strategy)
-
-                    for habit in habits_generated:
-
-                        clean_habit = habit.replace("-", "").strip()
-
-                        if clean_habit:
-                            add_habit(clean_habit)
 
         else:
             st.warning("Please describe your goals first.")
+
+    else:
+        st.warning("Please describe your goals first.")
 
     # -----------------------------
     # DISPLAY LIFE STRATEGY

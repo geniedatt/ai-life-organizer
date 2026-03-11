@@ -38,6 +38,15 @@ def init_db():
     )
     """)
 
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS memory (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        note TEXT
+    )
+    """)
+
+
     conn.commit()
     conn.close()
 
@@ -181,3 +190,32 @@ def get_habits():
     conn.close()
 
     return habits
+
+
+def save_weekly_plan(plan):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM weekly_plan")
+    cursor.execute("INSERT INTO weekly_plan (plan) VALUES (?)", (plan,))
+
+    conn.commit()
+    conn.close()
+
+
+def get_weekly_plan():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT plan FROM weekly_plan LIMIT 1")
+
+    result = cursor.fetchone()
+
+    conn.close()
+
+    if result:
+        return result[0]
+
+    return None

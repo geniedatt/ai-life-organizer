@@ -1,5 +1,5 @@
 import streamlit as st
-from database import get_tasks
+from database import get_tasks, get_weekly_plan, save_weekly_plan
 from ai.planner import weekly_plan
 
 
@@ -13,14 +13,34 @@ def weekly_page():
         st.info("No tasks available yet.")
         return
 
-    # Convert database rows into task list
     task_list = [task[1] for task in tasks]
 
-    with st.spinner("Generating your weekly plan..."):
+    # Check session first
+    if "weekly_plan" not in st.session_state:
 
-        plan = weekly_plan(task_list)
+        # Check database
+        saved_plan = get_weekly_plan()
 
-    if plan:
-        st.markdown(plan)
-    else:
-        st.warning("Could not generate a weekly plan.")
+        if saved_plan:
+            st.session_state.weekly_plan = saved_plan
+
+        else:
+            with st.spinner("Generating weekly plan..."):
+
+                plan = weekly_plan(task_list)
+
+                if plan:
+                    st.session_state.weekly_plan = plan
+                    save_weekly_plan(plan)
+
+    st.markdown(st.session_state.weekly_plan)
+
+    if st.button("🔄 Regenerate Weekly Plan"):
+
+        with st.spinner("Updating plan..."):
+
+            plan = weekly_plan(task_list)
+
+            if plan:
+                st.session_state.weekly_plan = plan
+                save_weekly_plan(plan)
