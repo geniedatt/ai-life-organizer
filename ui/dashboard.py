@@ -25,11 +25,15 @@ def dashboard_page():
 
     if st.button("Generate Life Plan"):
 
+        st.write("Button clicked")
+
         if life_input.strip():
 
             with st.spinner("Generating your AI life strategy..."):
 
                 strategy = generate_life_strategy(life_input)
+
+                st.write("AI Response:", strategy)
 
                 if strategy:
                     st.session_state.life_strategy = strategy
@@ -58,4 +62,3 @@ def dashboard_page():
         if plan:
             st.subheader("📅 Weekly Plan")
             st.markdown(plan)
-            

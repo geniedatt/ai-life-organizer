@@ -21,4 +21,9 @@ User thoughts:
 Return a clear structured plan.
 """
 
-    return ai_chat(prompt, "You are an expert life coach and strategist.")
+    result = ai_chat(prompt, "You are an expert life coach and strategist.")
+
+    if result:
+        return result
+    else:
+        return "⚠️ AI could not generate a strategy. Please try again."
