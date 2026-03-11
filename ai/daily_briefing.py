@@ -7,9 +7,13 @@ def generate_daily_briefing(tasks, habits):
     habit_list = "\n".join([h[1] for h in habits])
 
     prompt = f"""
-You are a motivational productivity coach.
+Create a SHORT daily briefing for a productivity dashboard.
 
-Create a short morning briefing for the user.
+Rules:
+- Maximum 5 sentences
+- Keep it concise
+- Avoid long motivational paragraphs
+- Focus on today's priorities
 
 Tasks:
 {task_list}
@@ -17,15 +21,18 @@ Tasks:
 Habits:
 {habit_list}
 
-The briefing should include:
+Return format:
 
-• encouragement
-• today's focus
-• recognition of their progress
+Good morning message.
 
-Keep it concise and motivating.
+Today's Focus:
+• key focus
+• key focus
+• key focus
+
+Short encouraging closing sentence.
 """
 
-    result = ai_chat(prompt, "You are an encouraging productivity coach.")
+    result = ai_chat(prompt, "You are a concise productivity coach.")
 
     return result
