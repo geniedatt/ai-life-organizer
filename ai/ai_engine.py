@@ -2,10 +2,8 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Load environment variables from .env (for local development)
 load_dotenv()
 
-# Create OpenAI client (automatically reads OPENAI_API_KEY)
 client = OpenAI()
 
 def ai_chat(prompt, system):
@@ -24,6 +22,7 @@ def ai_chat(prompt, system):
         return response.choices[0].message.content
 
     except Exception as e:
-        print("AI Error:", e)
-        return None
-    
+
+        print("OPENAI ERROR:", e)
+
+        return f"AI Error: {e}"
