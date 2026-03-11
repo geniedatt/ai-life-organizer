@@ -1,3 +1,5 @@
+from ai.task_generator import generate_tasks_from_strategy
+from database import add_task
 from ai.life_strategy import generate_life_strategy
 from ai.planner import weekly_plan
 from database import get_tasks
@@ -32,7 +34,17 @@ def dashboard_page():
                 strategy = generate_life_strategy(life_input)
 
                 if strategy:
+
                     st.session_state.life_strategy = strategy
+
+                    tasks = generate_tasks_from_strategy(strategy)
+
+                    for task in tasks:
+
+                        clean_task = task.replace("-", "").strip()
+
+                        if clean_task:
+                            add_task(clean_task)
 
         else:
             st.warning("Please describe your goals first.")
