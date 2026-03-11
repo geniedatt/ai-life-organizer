@@ -1,12 +1,13 @@
-from database import init_db
 import streamlit as st
 
+from database import init_db
 from ui.dashboard import dashboard_page
-from ui.tasks import tasks_page
 from ui.goals import goals_page
+from ui.tasks import tasks_page
 from ui.habits import habits_page
-from analytics.insights import analytics_page
+from ui.weekly import weekly_page
 
+# Initialize database
 init_db()
 
 st.set_page_config(
@@ -15,29 +16,38 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("🧠 AI Life Organizer")
-st.caption("Turn thoughts into organized goals, tasks, and habits.")
+# -----------------------------
+# SIDEBAR NAVIGATION
+# -----------------------------
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "Dashboard",
-    "Tasks",
-    "Goals",
-    "Habits",
-    "Analytics"
-])
+st.sidebar.title("🧠 AI Life Organizer")
 
-with tab1:
+page = st.sidebar.radio(
+    "Navigate",
+    [
+        "Dashboard",
+        "Goals",
+        "Tasks",
+        "Habits",
+        "Weekly Plan"
+    ]
+)
+
+# -----------------------------
+# PAGE ROUTING
+# -----------------------------
+
+if page == "Dashboard":
     dashboard_page()
 
-with tab2:
-    tasks_page()
-
-with tab3:
+elif page == "Goals":
     goals_page()
 
-with tab4:
+elif page == "Tasks":
+    tasks_page()
+
+elif page == "Habits":
     habits_page()
 
-with tab5:
-    analytics_page()
-    
+elif page == "Weekly Plan":
+    weekly_page()
