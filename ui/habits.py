@@ -120,12 +120,18 @@ def habits_page():
 
     st.metric("⚡ Momentum Score", f"{momentum}/100")
 
-    if momentum >= 80:
+    if momentum == 0:
+        st.info("Start completing habits to build your momentum score.")
+
+    elif momentum >= 80:
         st.success("You're on fire. Your systems are working.")
+
     elif momentum >= 60:
         st.info("Solid progress. Stay consistent.")
+
     elif momentum >= 40:
         st.warning("Momentum is slipping. Focus on your core habits.")
+    
     else:
         st.error("Your system is breaking down. Reset and rebuild momentum.")
 
