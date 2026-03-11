@@ -38,7 +38,7 @@ def init_db():
     )
     """)
 
-    
+    # MEMORY TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS memory (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +46,13 @@ def init_db():
     )
     """)
 
+    # WEEKLY PLAN TABLE
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS weekly_plan (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        plan TEXT
+    )
+    """)
 
     conn.commit()
     conn.close()
@@ -62,11 +69,18 @@ def add_task(task):
 
     clean_task = task.strip().lower()
 
-    cursor.execute("SELECT * FROM tasks WHERE LOWER(task)=?", (clean_task,))
+    cursor.execute(
+        "SELECT * FROM tasks WHERE LOWER(task)=?",
+        (clean_task,)
+    )
+
     exists = cursor.fetchone()
 
     if not exists:
-        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (clean_task,))
+        cursor.execute(
+            "INSERT INTO tasks (task) VALUES (?)",
+            (clean_task,)
+        )
 
     conn.commit()
     conn.close()
@@ -77,7 +91,9 @@ def get_tasks():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, task, completed FROM tasks")
+    cursor.execute(
+        "SELECT id, task, completed FROM tasks"
+    )
 
     tasks = cursor.fetchall()
 
@@ -91,7 +107,10 @@ def complete_task(task_id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE tasks SET completed=1 WHERE id=?", (task_id,))
+    cursor.execute(
+        "UPDATE tasks SET completed=1 WHERE id=?",
+        (task_id,)
+    )
 
     conn.commit()
     conn.close()
@@ -102,14 +121,17 @@ def delete_task(task_id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM tasks WHERE id=?", (task_id,))
+    cursor.execute(
+        "DELETE FROM tasks WHERE id=?",
+        (task_id,)
+    )
 
     conn.commit()
     conn.close()
 
 
 # -----------------------------
-# STREAK SYSTEM
+# TASK STREAK SYSTEM
 # -----------------------------
 
 def update_streak(task_id, preferred_time=None):
@@ -163,7 +185,11 @@ def add_habit(habit):
 
     clean_habit = habit.strip().lower()
 
-    cursor.execute("SELECT * FROM habits WHERE LOWER(habit)=?", (clean_habit,))
+    cursor.execute(
+        "SELECT * FROM habits WHERE LOWER(habit)=?",
+        (clean_habit,)
+    )
+
     exists = cursor.fetchone()
 
     if not exists:
@@ -182,8 +208,11 @@ def get_habits():
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT id, habit, streak FROM habits")
+        cursor.execute(
+            "SELECT id, habit, streak FROM habits"
+        )
         habits = cursor.fetchall()
+
     except sqlite3.OperationalError:
         habits = []
 
@@ -192,13 +221,21 @@ def get_habits():
     return habits
 
 
+# -----------------------------
+# WEEKLY PLAN STORAGE
+# -----------------------------
+
 def save_weekly_plan(plan):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM weekly_plan")
-    cursor.execute("INSERT INTO weekly_plan (plan) VALUES (?)", (plan,))
+
+    cursor.execute(
+        "INSERT INTO weekly_plan (plan) VALUES (?)",
+        (plan,)
+    )
 
     conn.commit()
     conn.close()
@@ -209,7 +246,9 @@ def get_weekly_plan():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT plan FROM weekly_plan LIMIT 1")
+    cursor.execute(
+        "SELECT plan FROM weekly_plan ORDER BY id DESC LIMIT 1"
+    )
 
     result = cursor.fetchone()
 
@@ -220,6 +259,10 @@ def get_weekly_plan():
 
     return None
 
+
+# -----------------------------
+# AI MEMORY SYSTEM
+# -----------------------------
 
 def save_memory(note):
 
@@ -240,12 +283,13 @@ def get_memory():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT note FROM memory ORDER BY id DESC LIMIT 10")
+    cursor.execute(
+        "SELECT note FROM memory ORDER BY id DESC LIMIT 10"
+    )
 
     rows = cursor.fetchall()
 
     conn.close()
 
     return [r[0] for r in rows]
-
 
