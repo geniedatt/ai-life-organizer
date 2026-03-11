@@ -56,6 +56,11 @@ def dashboard_page():
 
         col1, col2, col3 = st.columns(3)
 
+        # Column headers FIRST
+        col1.markdown("### 🏃 Health")
+        col2.markdown("### 💼 Work")
+        col3.markdown("### 🧠 Learning")
+
         health_keywords = ["exercise", "water", "health", "stretch", "sleep", "workout"]
         work_keywords = ["business", "code", "project", "mvp", "software", "build"]
         learning_keywords = ["study", "learn", "read", "course", "ai"]
@@ -68,7 +73,6 @@ def dashboard_page():
 
             label = f"{habit_name} — 🔥 {streak} day streak"
 
-            # Categorize habit
             lower = habit_name.lower()
 
             if any(k in lower for k in health_keywords):
@@ -86,9 +90,6 @@ def dashboard_page():
             if completed:
                 update_habit_streak(habit_id)
 
-        col1.markdown("### 🏃 Health")
-        col2.markdown("### 💼 Work")
-        col3.markdown("### 🧠 Learning")
 
 
     # -----------------------------
