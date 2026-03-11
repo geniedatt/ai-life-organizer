@@ -19,21 +19,17 @@ def dashboard_page():
     st.subheader("🧠 AI Life Strategy")
 
     life_input = st.text_area(
-        "Describe your life goals, problems, or ambitions",
-        placeholder="Example: I want to get healthier, learn coding, and start a business..."
+        "Brain dump everything on your mind (goals, worries, ideas, things you want to improve)",
+        placeholder="Example: I want to get healthier, start a business, spend more time with family, and feel less stressed."
     )
 
     if st.button("Generate Life Plan"):
-
-        st.write("Button clicked")
 
         if life_input.strip():
 
             with st.spinner("Generating your AI life strategy..."):
 
                 strategy = generate_life_strategy(life_input)
-
-                st.write("AI Response:", strategy)
 
                 if strategy:
                     st.session_state.life_strategy = strategy

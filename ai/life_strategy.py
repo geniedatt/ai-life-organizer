@@ -4,24 +4,33 @@ from ai.ai_engine import ai_chat
 def generate_life_strategy(brain_dump):
 
     prompt = f"""
-You are an AI life strategist.
+Turn the user's thoughts into a practical 30-day life execution plan.
 
-From the user's thoughts below, create a 30-day life improvement plan.
+Your response must include:
 
-Include:
+### Top 3 Life Goals
+Clear and specific goals.
 
-1. Top 3 Life Goals
-2. Weekly Focus Plan
-3. Daily Habits
-4. First Actions To Start Today
+### Weekly Focus Plan
+Week 1–4 with concrete objectives.
+
+### Daily Habits
+Simple repeatable behaviors.
+
+### Actionable Tasks
+Specific things the user can actually do.
+
+### First 3 Actions To Start Today
+Immediate next steps.
 
 User thoughts:
 {brain_dump}
 
-Return a clear structured plan.
+Make the plan practical, motivating, and clear.
+Avoid generic advice.
 """
 
-    result = ai_chat(prompt, "You are an expert life coach and strategist.")
+    result = ai_chat(prompt, "You are an elite life strategist and productivity architect.")
 
     if result:
         return result
