@@ -5,6 +5,7 @@ from ui.dashboard import dashboard_page
 from ui.goals import goals_page
 from ui.tasks import tasks_page
 from ui.habits import habits_page
+from ui.analytics import analytics_page
 from ui.weekly import weekly_page
 
 # Initialize database
@@ -29,7 +30,8 @@ page = st.sidebar.radio(
         "Goals",
         "Tasks",
         "Habits",
-        "Weekly Plan"
+        "Weekly Plan",
+        "Analytics"
     ]
 )
 
@@ -51,3 +53,6 @@ elif page == "Habits":
 
 elif page == "Weekly Plan":
     weekly_page()
+
+elif page == "Analytics":
+    analytics_page()
