@@ -111,6 +111,7 @@ def habits_page():
         st.info("No habits yet. Generate a life strategy first.")
         return
 
+
     # --------------------------------------------------
     # MOMENTUM SCORE
     # --------------------------------------------------
@@ -121,17 +122,48 @@ def habits_page():
 
     if momentum >= 80:
         st.success("You're on fire. Your systems are working.")
-
     elif momentum >= 60:
         st.info("Solid progress. Stay consistent.")
-
     elif momentum >= 40:
         st.warning("Momentum is slipping. Focus on your core habits.")
-
     else:
         st.error("Your system is breaking down. Reset and rebuild momentum.")
 
     st.divider()
+
+
+    # --------------------------------------------------
+    # DAILY EXECUTION SCORE  (NEW FEATURE)
+    # --------------------------------------------------
+
+    st.subheader("📊 Today's Execution")
+
+    today_completed = 0
+
+    for habit in habits:
+
+        habit_id = habit[0]
+        activity = get_habit_activity(habit_id)
+
+        if not activity:
+            continue
+
+        df = pd.DataFrame(activity, columns=["date"])
+        df["date"] = pd.to_datetime(df["date"])
+
+        if (df["date"].dt.date == date.today()).any():
+            today_completed += 1
+
+    total_habits = len(habits)
+
+    progress = today_completed / total_habits if total_habits else 0
+
+    st.progress(progress)
+
+    st.write(f"**{today_completed} / {total_habits} habits completed today**")
+
+    st.divider()
+
 
     # --------------------------------------------------
     # CALCULATE REAL STREAKS
@@ -162,6 +194,7 @@ def habits_page():
         st.warning("No habit data available.")
         return
 
+
     # --------------------------------------------------
     # HABIT OF THE WEEK
     # --------------------------------------------------
@@ -176,6 +209,7 @@ def habits_page():
     )
 
     st.divider()
+
 
     # --------------------------------------------------
     # AI HABIT COACH
@@ -202,6 +236,7 @@ def habits_page():
 
     st.divider()
 
+
     # --------------------------------------------------
     # TODAY'S HABITS
     # --------------------------------------------------
@@ -220,12 +255,12 @@ def habits_page():
 
             log_habit_completion(habit_id)
             st.session_state[f"logged_{habit_id}"] = True
-
             st.rerun()
 
         st.caption(f"🔥 {streak} day streak")
 
     st.divider()
+
 
     # --------------------------------------------------
     # TOP 3 HABITS
@@ -239,20 +274,9 @@ def habits_page():
         silver = habit_data[1]
         bronze = habit_data[2]
 
-        col1.metric(
-            label=f"🥇 {gold['name']}",
-            value=f"🔥 {gold['streak']} days"
-        )
-
-        col2.metric(
-            label=f"🥈 {silver['name']}",
-            value=f"🔥 {silver['streak']} days"
-        )
-
-        col3.metric(
-            label=f"🥉 {bronze['name']}",
-            value=f"🔥 {bronze['streak']} days"
-        )
+        col1.metric(f"🥇 {gold['name']}", f"🔥 {gold['streak']} days")
+        col2.metric(f"🥈 {silver['name']}", f"🔥 {silver['streak']} days")
+        col3.metric(f"🥉 {bronze['name']}", f"🔥 {bronze['streak']} days")
 
         remaining = habit_data[3:]
 
@@ -261,6 +285,7 @@ def habits_page():
         remaining = habit_data
 
     st.divider()
+
 
     # --------------------------------------------------
     # FULL LEADERBOARD
@@ -277,6 +302,7 @@ def habits_page():
         )
 
     st.divider()
+
 
     # --------------------------------------------------
     # HABIT CALENDAR
