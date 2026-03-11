@@ -172,9 +172,11 @@ def get_habits():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, habit, streak FROM habits")
-
-    habits = cursor.fetchall()
+    try:
+        cursor.execute("SELECT id, habit, streak FROM habits")
+        habits = cursor.fetchall()
+    except sqlite3.OperationalError:
+        habits = []
 
     conn.close()
 

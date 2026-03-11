@@ -1,5 +1,5 @@
-import streamlit as st
 from database import init_db
+import streamlit as st
 
 from ui.dashboard import dashboard_page
 from ui.tasks import tasks_page
