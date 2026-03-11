@@ -7,6 +7,7 @@ from ui.tasks import tasks_page
 from ui.habits import habits_page
 from ui.analytics import analytics_page
 from ui.weekly import weekly_page
+from ui.war_room import war_room_page
 
 # Initialize database
 init_db()
@@ -26,6 +27,7 @@ st.sidebar.title("🧠 AI Life Organizer")
 page = st.sidebar.radio(
     "Navigate",
     [
+        "War Room",       # ⭐ NEW DAILY COMMAND CENTER
         "Dashboard",
         "Goals",
         "Tasks",
@@ -39,7 +41,10 @@ page = st.sidebar.radio(
 # PAGE ROUTING
 # -----------------------------
 
-if page == "Dashboard":
+if page == "War Room":
+    war_room_page()
+
+elif page == "Dashboard":
     dashboard_page()
 
 elif page == "Goals":
