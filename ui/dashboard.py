@@ -1,6 +1,13 @@
 import streamlit as st
 
-from database import get_tasks, get_habits
+from database import (
+    get_tasks,
+    get_habits,
+    get_weekly_plan,
+    save_weekly_plan,
+    update_habit_streak
+)
+
 from ai.planner import weekly_plan
 from services.strategy_service import build_full_strategy
 from ai.daily_briefing import generate_daily_briefing
@@ -30,7 +37,35 @@ def dashboard_page():
                 st.session_state.daily_briefing = briefing
 
     if "daily_briefing" in st.session_state:
-        st.markdown(st.session_state.daily_briefing.replace("Today's Focus:", "Today's Focus:\n"))
+
+        formatted_briefing = (
+            st.session_state.daily_briefing
+            .replace("Today's Focus:", "Today's Focus:\n")
+            .replace("- ", "• ")
+        )
+
+        st.markdown(formatted_briefing)
+
+    # -----------------------------
+    # DAILY HABITS
+    # -----------------------------
+
+    if habits:
+
+        st.subheader("🔥 Daily Habits")
+
+        for habit in habits:
+
+            habit_id = habit[0]
+            habit_name = habit[1]
+            streak = habit[2]
+
+            label = f"{habit_name} — 🔥 {streak} day streak"
+
+            completed = st.checkbox(label, key=f"habit_{habit_id}")
+
+            if completed:
+                update_habit_streak(habit_id)
 
     # -----------------------------
     # AI LIFE STRATEGY
@@ -73,8 +108,17 @@ def dashboard_page():
 
     if tasks:
 
-        plan = weekly_plan(tasks)
+        stored_plan = get_weekly_plan()
 
-        if plan:
+        if not stored_plan:
+
+            with st.spinner("Creating your weekly plan..."):
+
+                stored_plan = weekly_plan(tasks)
+
+                if stored_plan:
+                    save_weekly_plan(stored_plan)
+
+        if stored_plan:
             st.subheader("📅 Weekly Plan")
-            st.markdown(plan)
+            st.markdown(stored_plan)
