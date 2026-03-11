@@ -219,3 +219,33 @@ def get_weekly_plan():
         return result[0]
 
     return None
+
+
+def save_memory(note):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO memory (note) VALUES (?)",
+        (note,)
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_memory():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT note FROM memory ORDER BY id DESC LIMIT 10")
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return [r[0] for r in rows]
+
+

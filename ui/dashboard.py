@@ -3,6 +3,7 @@ import streamlit as st
 from database import get_tasks, get_habits
 from ai.planner import weekly_plan
 from services.strategy_service import build_full_strategy
+from ai.daily_briefing import generate_daily_briefing
 
 
 def dashboard_page():
@@ -14,15 +15,22 @@ def dashboard_page():
     st.subheader("Daily Briefing")
 
     tasks = get_tasks()
-    st.write(f"You have {len(tasks)} tasks.")
-
     habits = get_habits()
 
-    if habits:
-        st.subheader("🔥 Daily Habits")
+    st.write(f"You have {len(tasks)} tasks.")
 
-        for habit in habits:
-            st.checkbox(habit[1], key=habit[0])
+    if tasks or habits:
+
+        if "daily_briefing" not in st.session_state:
+
+            with st.spinner("Preparing your daily briefing..."):
+
+                briefing = generate_daily_briefing(tasks, habits)
+
+                if briefing:
+                    st.session_state.daily_briefing = briefing
+
+        st.markdown(st.session_state.daily_briefing)
 
     # -----------------------------
     # AI LIFE STRATEGY
