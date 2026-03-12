@@ -1,114 +1,63 @@
 import streamlit as st
-from datetime import date
-from database import get_habits, get_habit_activity, calculate_xp
+
+from services.xp_service import calculate_xp
+from database import get_tasks, get_habits
+from ai.daily_briefing import generate_daily_briefing
 
 
 def war_room_page():
 
-    st.title("⚔️ Daily War Room")
-    xp, level = calculate_xp()
+    st.title("⚔️ AI War Room")
 
-    st.metric("🏆 Life XP", xp)
-    st.caption(f"LEVEL {level}")
+    st.subheader("Your Strategic Life Dashboard")
 
+    # --------------------------------
+    # LOAD DATA
+    # --------------------------------
+
+    tasks = get_tasks()
     habits = get_habits()
 
-    if not habits:
-        st.info("Generate a life strategy first to create your battle plan.")
-        return
+    xp, level = calculate_xp()
 
+    briefing = generate_daily_briefing(tasks, habits)
 
+    # --------------------------------
+    # CORE METRICS
+    # --------------------------------
 
-    # -----------------------------
-    # TODAY'S EXECUTION SCORE
-    # -----------------------------
+    col1, col2, col3 = st.columns(3)
 
-    today_completed = 0
-
-    for habit in habits:
-
-        habit_id = habit[0]
-
-        activity = get_habit_activity(habit_id)
-
-        if not activity:
-            continue
-
-        for record in activity:
-            if str(record[0]) == str(date.today()):
-                today_completed += 1
-                break
-
-    total = len(habits)
-
-    score = int((today_completed / total) * 100) if total else 0
-
-
-    st.metric("⚡ Execution Score", f"{score}/100")
-
-
-    # -----------------------------
-    # STATUS MESSAGE
-    # -----------------------------
-
-    if score == 100:
-        st.success("🏆 DAY WON. Elite execution.")
-
-    elif score >= 70:
-        st.info("Strong execution. Finish the remaining targets.")
-
-    elif score >= 40:
-        st.warning("Momentum building. Stay focused.")
-
-    else:
-        st.error("Battle not started. Execute your first habit.")
-
+    col1.metric("XP", xp)
+    col2.metric("Level", level)
+    col3.metric("Momentum", briefing["momentum"])
 
     st.divider()
 
+    # --------------------------------
+    # SYSTEM STATUS
+    # --------------------------------
 
-    # -----------------------------
-    # TODAY'S TARGETS
-    # -----------------------------
+    st.subheader("System Status")
 
-    st.subheader("🎯 Today's Targets")
+    st.write(f"Active Tasks: {len(tasks)}")
+    st.write(f"Active Habits: {len(habits)}")
 
-    for habit in habits:
+    # --------------------------------
+    # STRATEGIC PRIORITIES
+    # --------------------------------
 
-        habit_name = habit[1]
+    st.subheader("Today's Strategic Priorities")
 
-        st.write(f"☐ {habit_name}")
-
+    for p in briefing["priorities"]:
+        st.write(f"• {p}")
 
     st.divider()
 
+    # --------------------------------
+    # AI COMMANDER ADVICE
+    # --------------------------------
 
-    # -----------------------------
-    # WIN THE DAY BUTTON
-    # -----------------------------
+    st.subheader("AI Commander Advice")
 
-    if score == 100:
-
-        if st.button("🏆 WIN THE DAY"):
-
-            st.success("SYSTEM UPDATE: Day completed with elite execution.")
-
-            xp, level = calculate_xp()
-
-            st.markdown(
-                f"""
-    ### 🏆 DAILY WIN
-
-    Execution Score: **100**
-
-    Life XP: **{xp}**
-
-    Level: **{level}**
-
-    Streak Momentum: **Rising**
-
-    #AI Life Organizer
-    """
-            )
-
-            st.balloons()
+    st.info(briefing["advice"])
