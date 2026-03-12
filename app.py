@@ -19,23 +19,18 @@ from ui.strategy_generator import strategy_generator_page
 from ui.strategist import strategist_page
 from ui.war_room import war_room_page
 
-# Gamification / Viral Features
+# Viral Features
 from ui.daily_plan import daily_plan_page
 from ui.achievements import achievements_page
 from ui.weekly_review import weekly_review_page
 from ui.leaderboard import leaderboard_page
 
 
-# -----------------------------
+# -------------------------
 # INITIALIZE DATABASE
-# -----------------------------
+# -------------------------
 
 init_db()
-
-
-# -----------------------------
-# PAGE CONFIG
-# -----------------------------
 
 st.set_page_config(
     page_title="AI Life Organizer",
@@ -43,111 +38,158 @@ st.set_page_config(
     layout="wide"
 )
 
-
-# -----------------------------
+# -------------------------
 # PWA SUPPORT
-# -----------------------------
+# -------------------------
 
 st.markdown(
     """
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#0e1117">
-    """,
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#0e1117">
+""",
     unsafe_allow_html=True
 )
 
-
-# -----------------------------
-# SIDEBAR NAVIGATION
-# -----------------------------
+# -------------------------
+# SIDEBAR
+# -------------------------
 
 st.sidebar.title("🧠 AI Life Organizer")
 
-page = st.sidebar.radio(
-    "Navigate",
-    [
+page = None
 
-        # COMMAND
-        "Dashboard",
-        "AI Strategist",
-        "War Room",
+# COMMAND CENTER
+st.sidebar.header("⚡ Command")
+if st.sidebar.button("Dashboard"):
+    page = "dashboard"
 
-        # EXECUTION
-        "Goals",
-        "Tasks",
-        "Habits",
-        "Daily Plan",
-        "Weekly Plan",
+if st.sidebar.button("AI Strategist"):
+    page = "strategist"
 
-        # AI
-        "AI Coach",
-        "Life Map",
-        "Command Center",
-        "Life Strategy",
-
-        # PERFORMANCE
-        "Analytics",
-        "Weekly Review",
-        "Achievements",
-        "Leaderboard",
-
-        # ACCOUNT
-        "Profile",
-    ]
-)
+if st.sidebar.button("War Room"):
+    page = "war_room"
 
 
-# -----------------------------
-# PAGE ROUTING
-# -----------------------------
+# EXECUTION
+st.sidebar.header("🎯 Execution")
 
-if page == "Dashboard":
+if st.sidebar.button("Goals"):
+    page = "goals"
+
+if st.sidebar.button("Tasks"):
+    page = "tasks"
+
+if st.sidebar.button("Habits"):
+    page = "habits"
+
+if st.sidebar.button("Daily Plan"):
+    page = "daily_plan"
+
+if st.sidebar.button("Weekly Plan"):
+    page = "weekly"
+
+
+# AI SYSTEMS
+st.sidebar.header("🤖 AI Systems")
+
+if st.sidebar.button("AI Coach"):
+    page = "coach"
+
+if st.sidebar.button("Life Map"):
+    page = "life_map"
+
+if st.sidebar.button("Command Center"):
+    page = "command_center"
+
+if st.sidebar.button("Life Strategy"):
+    page = "life_strategy"
+
+
+# PERFORMANCE
+st.sidebar.header("📈 Performance")
+
+if st.sidebar.button("Analytics"):
+    page = "analytics"
+
+if st.sidebar.button("Weekly Review"):
+    page = "weekly_review"
+
+if st.sidebar.button("Achievements"):
+    page = "achievements"
+
+if st.sidebar.button("Leaderboard"):
+    page = "leaderboard"
+
+
+# ACCOUNT
+st.sidebar.header("👤 Account")
+
+if st.sidebar.button("Profile"):
+    page = "profile"
+
+
+# -------------------------
+# DEFAULT PAGE
+# -------------------------
+
+if "page" not in st.session_state:
+    st.session_state.page = "dashboard"
+
+if page:
+    st.session_state.page = page
+
+
+# -------------------------
+# ROUTING
+# -------------------------
+
+if st.session_state.page == "dashboard":
     dashboard_page()
 
-elif page == "AI Strategist":
+elif st.session_state.page == "strategist":
     strategist_page()
 
-elif page == "War Room":
+elif st.session_state.page == "war_room":
     war_room_page()
 
-elif page == "Goals":
+elif st.session_state.page == "goals":
     goals_page()
 
-elif page == "Tasks":
+elif st.session_state.page == "tasks":
     tasks_page()
 
-elif page == "Habits":
+elif st.session_state.page == "habits":
     habits_page()
 
-elif page == "Daily Plan":
+elif st.session_state.page == "daily_plan":
     daily_plan_page()
 
-elif page == "Weekly Plan":
+elif st.session_state.page == "weekly":
     weekly_page()
 
-elif page == "AI Coach":
+elif st.session_state.page == "coach":
     coach_chat_page()
 
-elif page == "Life Map":
+elif st.session_state.page == "life_map":
     life_map_page()
 
-elif page == "Command Center":
+elif st.session_state.page == "command_center":
     command_center_page()
 
-elif page == "Life Strategy":
+elif st.session_state.page == "life_strategy":
     strategy_generator_page()
 
-elif page == "Analytics":
+elif st.session_state.page == "analytics":
     analytics_page()
 
-elif page == "Weekly Review":
+elif st.session_state.page == "weekly_review":
     weekly_review_page()
 
-elif page == "Achievements":
+elif st.session_state.page == "achievements":
     achievements_page()
 
-elif page == "Leaderboard":
+elif st.session_state.page == "leaderboard":
     leaderboard_page()
 
-elif page == "Profile":
+elif st.session_state.page == "profile":
     profile_page()
