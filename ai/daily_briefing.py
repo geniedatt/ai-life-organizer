@@ -1,11 +1,7 @@
-from database import get_habits, get_tasks
 from services.xp_service import calculate_xp
 
 
 def generate_daily_briefing(tasks, habits):
-
-    habits = get_habits()
-    tasks = get_tasks()
 
     xp, level = calculate_xp()
 
@@ -34,7 +30,7 @@ def generate_daily_briefing(tasks, habits):
     if momentum == "Low":
         advice = "Focus on small wins to rebuild momentum."
 
-    if momentum == "High":
+    elif momentum == "High":
         advice = "You have strong momentum. Push your biggest goal today."
 
     return {
@@ -44,3 +40,4 @@ def generate_daily_briefing(tasks, habits):
         "xp": xp,
         "level": level
     }
+
