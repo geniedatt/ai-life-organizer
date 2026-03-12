@@ -10,6 +10,10 @@ from ui.weekly import weekly_page
 from ui.war_room import war_room_page
 from ui.strategist import strategist_page
 from ui.profile import profile_page
+from ui.coach_chat import coach_chat_page
+from ui.life_map import life_map_page
+
+
 
 # Initialize database
 init_db()
@@ -56,6 +60,12 @@ page = st.sidebar.radio(
 
 if page == "War Room":
     war_room_page()
+
+elif page == "Life Map":
+    life_map_page()
+
+elif page == "AI Coach":
+    coach_chat_page()
 
 elif page == "Profile":
     profile_page()
