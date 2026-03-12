@@ -12,6 +12,12 @@ from ui.strategist import strategist_page
 from ui.profile import profile_page
 from ui.coach_chat import coach_chat_page
 from ui.life_map import life_map_page
+from ui.command_center import command_center_page
+from ui.strategy_generator import strategy_generator_page
+from ui.daily_plan import daily_plan_page
+from ui.achievements import achievements_page
+from ui.weekly_review import weekly_review_page
+from ui.leaderboard import leaderboard_page
 
 
 
@@ -42,15 +48,24 @@ st.sidebar.title("🧠 AI Life Organizer")
 page = st.sidebar.radio(
     "Navigate",
     [
+        "Dashboard",
         "AI Strategist",  # ⭐ NEW DAILY COMMAND CENTER
         "War Room",       
-        "Dashboard",
         "Goals",
         "Tasks",
         "Habits",
         "Weekly Plan",
         "Analytics",
-        "Profile"
+        "Profile",
+        "AI Coach",
+        "Life Map",
+        "Command Center",
+        "Life Strategy",
+        "Daily Plan",
+        "Achievements",
+        "Weekly Review",
+        "Leaderboard"
+
     ]
 )
 
@@ -60,6 +75,24 @@ page = st.sidebar.radio(
 
 if page == "War Room":
     war_room_page()
+
+elif page == "Daily Plan":
+    daily_plan_page()
+
+elif page == "Achievements":
+    achievements_page()
+
+elif page == "Weekly Review":
+    weekly_review_page()
+
+elif page == "Leaderboard":
+    leaderboard_page()
+
+elif page == "Life Strategy":
+    strategy_generator_page()
+
+elif page == "Command Center":
+    command_center_page()
 
 elif page == "Life Map":
     life_map_page()
