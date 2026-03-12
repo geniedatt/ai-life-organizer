@@ -1,38 +1,46 @@
-from ai.ai_engine import ai_chat
+from database import get_habits, get_tasks
+from services.xp_service import calculate_xp
 
 
 def generate_daily_briefing(tasks, habits):
 
-    task_list = "\n".join([t[1] for t in tasks])
-    habit_list = "\n".join([h[1] for h in habits])
+    habits = get_habits()
+    tasks = get_tasks()
 
-    prompt = f"""
-Create a SHORT daily briefing for a productivity dashboard.
+    xp, level = calculate_xp()
 
-Rules:
-- Maximum 5 sentences
-- Keep it concise
-- Avoid long motivational paragraphs
-- Focus on today's priorities
+    habit_count = len(habits)
+    task_count = len(tasks)
 
-Tasks:
-{task_list}
+    momentum = "Low"
 
-Habits:
-{habit_list}
+    if xp > 500:
+        momentum = "High"
+    elif xp > 200:
+        momentum = "Medium"
 
-Return format:
+    priorities = []
 
-Good morning message.
+    if task_count > 0:
+        priorities.append("Complete your most important task")
 
-Today's Focus:
-• key focus
-• key focus
-• key focus
+    if habit_count > 0:
+        priorities.append("Maintain your habit streaks")
 
-Short encouraging closing sentence.
-"""
+    priorities.append("Schedule a deep work block")
 
-    result = ai_chat(prompt, "You are a concise productivity coach.")
+    advice = "Stay consistent today."
 
-    return result
+    if momentum == "Low":
+        advice = "Focus on small wins to rebuild momentum."
+
+    if momentum == "High":
+        advice = "You have strong momentum. Push your biggest goal today."
+
+    return {
+        "momentum": momentum,
+        "priorities": priorities,
+        "advice": advice,
+        "xp": xp,
+        "level": level
+    }
