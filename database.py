@@ -396,3 +396,27 @@ def get_habit_activity(habit_id):
     conn.close()
 
     return {r[0] for r in rows}
+
+# --------------------------------------------------
+# XP SYSTEM
+# --------------------------------------------------
+
+def calculate_xp():
+
+    habits = get_habits()
+
+    total_completions = 0
+
+    for habit in habits:
+
+        habit_id = habit[0]
+        activity = get_habit_activity(habit_id)
+
+        if activity:
+            total_completions += len(activity)
+
+    xp = total_completions * 10
+
+    level = xp // 100 + 1
+
+    return xp, level

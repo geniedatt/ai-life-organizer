@@ -1,17 +1,22 @@
 import streamlit as st
 from datetime import date
-from database import get_habits, get_habit_activity
+from database import get_habits, get_habit_activity, calculate_xp
 
 
 def war_room_page():
 
     st.title("⚔️ Daily War Room")
+    xp, level = calculate_xp()
+
+    st.metric("🏆 Life XP", xp)
+    st.caption(f"LEVEL {level}")
 
     habits = get_habits()
 
     if not habits:
         st.info("Generate a life strategy first to create your battle plan.")
         return
+
 
 
     # -----------------------------
@@ -86,6 +91,24 @@ def war_room_page():
 
         if st.button("🏆 WIN THE DAY"):
 
-            st.success("SYSTEM UPDATE: You executed perfectly today.")
+            st.success("SYSTEM UPDATE: Day completed with elite execution.")
+
+            xp, level = calculate_xp()
+
+            st.markdown(
+                f"""
+    ### 🏆 DAILY WIN
+
+    Execution Score: **100**
+
+    Life XP: **{xp}**
+
+    Level: **{level}**
+
+    Streak Momentum: **Rising**
+
+    #AI Life Organizer
+    """
+            )
 
             st.balloons()
