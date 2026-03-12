@@ -11,44 +11,73 @@ from database import (
 from ai.planner import weekly_plan
 from services.strategy_service import build_full_strategy
 from ai.daily_briefing import generate_daily_briefing
+from services.mission_service import generate_daily_mission
 
 
 def dashboard_page():
 
-    # -----------------------------
-    # DAILY BRIEFING
-    # -----------------------------
-
-    st.subheader("Daily Briefing")
+    st.title("🧠 AI Life Organizer")
 
     tasks = get_tasks()
     habits = get_habits()
 
-    st.write(f"You have {len(tasks)} tasks.")
+    # --------------------------------------------------
+    # DAILY BRIEFING
+    # --------------------------------------------------
 
-    # Generate briefing once per session
+    st.subheader("🧠 Daily Briefing")
+
     if "daily_briefing" not in st.session_state:
 
         with st.spinner("Preparing your daily briefing..."):
 
-            briefing = generate_daily_briefing(tasks, habits)
+            briefing = generate_daily_briefing()
 
             if briefing:
                 st.session_state.daily_briefing = briefing
 
     if "daily_briefing" in st.session_state:
 
-        formatted_briefing = (
-            st.session_state.daily_briefing
-            .replace("Today's Focus:", "Today's Focus:\n")
-            .replace("- ", "• ")
-        )
+        briefing = st.session_state.daily_briefing
 
-        st.markdown(formatted_briefing)
+        st.metric("Momentum", briefing["momentum"])
+
+        st.write("### 🎯 Top Priorities Today")
+
+        for p in briefing["priorities"]:
+            st.write(f"• {p}")
+
+        st.write("### 🧭 System Advice")
+
+        st.info(briefing["advice"])
+
+        col1, col2 = st.columns(2)
+
+        col1.metric("⚡ XP", briefing["xp"])
+        col2.metric("🏆 Level", briefing["level"])
+
+    st.divider()
 
     # -----------------------------
+    # DAILY MISSION
+    # -----------------------------
+
+    st.subheader("🎯 Today's Mission")
+
+    if "daily_mission" not in st.session_state:
+
+        mission = generate_daily_mission()
+        st.session_state.daily_mission = mission
+
+    for step, item in enumerate(st.session_state.daily_mission, start=1):
+
+        st.write(f"{step}. {item}")
+
+    st.divider()
+
+    # --------------------------------------------------
     # DAILY HABITS
-    # -----------------------------
+    # --------------------------------------------------
 
     if habits:
 
@@ -56,7 +85,6 @@ def dashboard_page():
 
         col1, col2, col3 = st.columns(3)
 
-        # Column headers FIRST
         col1.markdown("### 🏃 Health")
         col2.markdown("### 💼 Work")
         col3.markdown("### 🧠 Learning")
@@ -72,7 +100,6 @@ def dashboard_page():
             streak = habit[2]
 
             label = f"{habit_name} — 🔥 {streak} day streak"
-
             lower = habit_name.lower()
 
             if any(k in lower for k in health_keywords):
@@ -87,14 +114,18 @@ def dashboard_page():
 
                 completed = col2.checkbox(label, key=f"habit_{habit_id}")
 
-            if completed:
+            if completed and not st.session_state.get(f"logged_{habit_id}"):
+
                 update_habit_streak(habit_id)
+                st.session_state[f"logged_{habit_id}"] = True
 
+                st.rerun()
 
+    st.divider()
 
-    # -----------------------------
+    # --------------------------------------------------
     # AI LIFE STRATEGY
-    # -----------------------------
+    # --------------------------------------------------
 
     st.subheader("🧠 AI Life Strategy")
 
@@ -117,9 +148,9 @@ def dashboard_page():
         else:
             st.warning("Please describe your goals first.")
 
-    # -----------------------------
+    # --------------------------------------------------
     # DISPLAY LIFE STRATEGY
-    # -----------------------------
+    # --------------------------------------------------
 
     if "life_strategy" in st.session_state:
 
@@ -127,9 +158,11 @@ def dashboard_page():
 
         st.markdown(st.session_state.life_strategy)
 
-    # -----------------------------
+    st.divider()
+
+    # --------------------------------------------------
     # WEEKLY PLAN
-    # -----------------------------
+    # --------------------------------------------------
 
     if tasks:
 
@@ -145,5 +178,7 @@ def dashboard_page():
                     save_weekly_plan(stored_plan)
 
         if stored_plan:
+
             st.subheader("📅 Weekly Plan")
+
             st.markdown(stored_plan)

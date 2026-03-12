@@ -9,6 +9,7 @@ from ui.analytics import analytics_page
 from ui.weekly import weekly_page
 from ui.war_room import war_room_page
 from ui.strategist import strategist_page
+from ui.profile import profile_page
 
 # Initialize database
 init_db()
@@ -35,7 +36,8 @@ page = st.sidebar.radio(
         "Tasks",
         "Habits",
         "Weekly Plan",
-        "Analytics"
+        "Analytics",
+        "Profile"
     ]
 )
 
@@ -45,6 +47,9 @@ page = st.sidebar.radio(
 
 if page == "War Room":
     war_room_page()
+
+elif page == "Profile":
+    profile_page()
 
 elif page == "AI Strategist":
     strategist_page()
