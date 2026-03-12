@@ -20,6 +20,15 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown(
+    """
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0e1117">
+    """,
+    unsafe_allow_html=True,
+)
+
+
 # -----------------------------
 # SIDEBAR NAVIGATION
 # -----------------------------
