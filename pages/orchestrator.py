@@ -3,6 +3,8 @@ from engine.life_orchestrator import run_life_orchestrator
 from engine.executive_briefing import generate_executive_briefing
 from engine.strategic_planner import generate_daily_strategy
 from engine.schedule_generator import generate_daily_schedule
+from engine.life_strategy import generate_life_strategy
+from engine.life_dashboard import generate_life_dashboard
 
 
 def orchestrator_page():
@@ -89,6 +91,28 @@ def orchestrator_page():
     adaptive = data.get("adaptive_strategy", [])
 
     # -------------------------
+    # LIFE SYSTEM HEALTH
+    # -------------------------
+
+    st.subheader("🧬 Life System Health")
+
+    dashboard = generate_life_dashboard()
+
+    col1, col2 = st.columns(2)
+
+    col1.progress(dashboard["execution"] / 100)
+    col1.write("Execution")
+
+    col1.progress(dashboard["habits"] / 100)
+    col1.write("Habits")
+
+    col2.progress(dashboard["momentum"] / 100)
+    col2.write("Momentum")
+
+    col2.progress(dashboard["focus"] / 100)
+    col2.write("Focus")
+
+    # -------------------------
     # EXECUTIVE METRICS
     # -------------------------
 
@@ -166,6 +190,40 @@ def orchestrator_page():
         st.info("No adaptive strategy changes suggested yet.")
 
     st.divider()
+
+    # -------------------------
+    # AI LIFE STRATEGY
+    # -------------------------
+
+    st.subheader("🧭 AI Life Strategy")
+
+    strategy = generate_life_strategy()
+
+    if strategy:
+
+        if strategy["focus"]:
+            st.write("### 🎯 Focus Areas")
+            for f in strategy["focus"]:
+                st.write("•", f)
+
+        if strategy["opportunities"]:
+            st.write("### 🚀 Opportunities")
+            for o in strategy["opportunities"]:
+                st.success(o)
+
+        if strategy["risks"]:
+            st.write("### ⚠ Strategic Risks")
+            for r in strategy["risks"]:
+                st.warning(r)
+
+        if strategy["moves"]:
+            st.write("### ♟ Strategic Moves")
+            for m in strategy["moves"]:
+                st.write("•", m)
+
+    else:
+
+        st.info("No strategic analysis available yet.")
 
     # -------------------------
     # EXECUTIVE SUMMARY
