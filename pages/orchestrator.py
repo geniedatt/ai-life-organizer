@@ -5,11 +5,14 @@ from engine.strategic_planner import generate_daily_strategy
 from engine.schedule_generator import generate_daily_schedule
 from engine.life_strategy import generate_life_strategy
 from engine.life_dashboard import generate_life_dashboard
+from services.subscription import is_pro_user
 
 
 def orchestrator_page():
 
     st.title("🧠 AI Strategic Command Center")
+
+    pro_user = is_pro_user()
 
     # -------------------------
     # DAILY EXECUTIVE BRIEFING
@@ -44,17 +47,22 @@ def orchestrator_page():
 
     st.subheader("🚀 AI Strategic Planner")
 
-    top_tasks = generate_daily_strategy()
+    if pro_user:
 
-    if top_tasks:
+        top_tasks = generate_daily_strategy()
 
-        st.write("### Today's Top Strategic Tasks")
+        if top_tasks:
+            st.write("### Today's Top Strategic Tasks")
 
-        for task in top_tasks:
-            st.success(task)
+            for task in top_tasks:
+                st.success(task)
+
+        else:
+            st.info("No tasks available to plan today.")
 
     else:
-        st.info("No tasks available to plan today.")
+
+        st.warning("🔒 AI Strategic Planner is a Pro feature.")
 
     st.divider()
 
@@ -64,15 +72,21 @@ def orchestrator_page():
 
     st.subheader("🗓 AI Daily Schedule")
 
-    schedule = generate_daily_schedule()
+    if pro_user:
 
-    if schedule:
+        schedule = generate_daily_schedule()
 
-        for block in schedule:
-            st.write(f"**{block['time']}** — {block['task']}")
+        if schedule:
+
+            for block in schedule:
+                st.write(f"**{block['time']}** — {block['task']}")
+
+        else:
+            st.info("No tasks available to schedule today.")
 
     else:
-        st.info("No tasks available to schedule today.")
+
+        st.warning("🔒 AI Daily Schedule is a Pro feature.")
 
     st.divider()
 
@@ -111,6 +125,8 @@ def orchestrator_page():
 
     col2.progress(dashboard["focus"] / 100)
     col2.write("Focus")
+
+    st.divider()
 
     # -------------------------
     # EXECUTIVE METRICS
@@ -151,29 +167,35 @@ def orchestrator_page():
 
     st.subheader("🧠 Chief of Staff Briefing")
 
-    if chief:
+    if pro_user:
 
-        focus = chief.get("focus", [])
-        risks = chief.get("risks", [])
-        advice = chief.get("advice", [])
+        if chief:
 
-        if focus:
-            st.write("### 🎯 Strategic Focus")
-            for item in focus:
-                st.write("•", item)
+            focus = chief.get("focus", [])
+            risks = chief.get("risks", [])
+            advice = chief.get("advice", [])
 
-        if risks:
-            st.write("### ⚠ Strategic Risks")
-            for risk in risks:
-                st.warning(risk)
+            if focus:
+                st.write("### 🎯 Strategic Focus")
+                for item in focus:
+                    st.write("•", item)
 
-        if advice:
-            st.write("### 🤖 AI Advice")
-            for tip in advice:
-                st.write("•", tip)
+            if risks:
+                st.write("### ⚠ Strategic Risks")
+                for risk in risks:
+                    st.warning(risk)
+
+            if advice:
+                st.write("### 🤖 AI Advice")
+                for tip in advice:
+                    st.write("•", tip)
+
+        else:
+            st.info("Chief of Staff analysis not available.")
 
     else:
-        st.info("Chief of Staff analysis not available.")
+
+        st.warning("🔒 Chief of Staff AI is a Pro feature.")
 
     st.divider()
 
@@ -183,11 +205,17 @@ def orchestrator_page():
 
     st.subheader("⚙ Adaptive Strategy")
 
-    if adaptive:
-        for change in adaptive:
-            st.write("•", change)
+    if pro_user:
+
+        if adaptive:
+            for change in adaptive:
+                st.write("•", change)
+        else:
+            st.info("No adaptive strategy changes suggested yet.")
+
     else:
-        st.info("No adaptive strategy changes suggested yet.")
+
+        st.warning("🔒 Adaptive Strategy is a Pro feature.")
 
     st.divider()
 
@@ -197,33 +225,40 @@ def orchestrator_page():
 
     st.subheader("🧭 AI Life Strategy")
 
-    strategy = generate_life_strategy()
+    if pro_user:
 
-    if strategy:
+        strategy = generate_life_strategy()
 
-        if strategy["focus"]:
-            st.write("### 🎯 Focus Areas")
-            for f in strategy["focus"]:
-                st.write("•", f)
+        if strategy:
 
-        if strategy["opportunities"]:
-            st.write("### 🚀 Opportunities")
-            for o in strategy["opportunities"]:
-                st.success(o)
+            if strategy["focus"]:
+                st.write("### 🎯 Focus Areas")
+                for f in strategy["focus"]:
+                    st.write("•", f)
 
-        if strategy["risks"]:
-            st.write("### ⚠ Strategic Risks")
-            for r in strategy["risks"]:
-                st.warning(r)
+            if strategy["opportunities"]:
+                st.write("### 🚀 Opportunities")
+                for o in strategy["opportunities"]:
+                    st.success(o)
 
-        if strategy["moves"]:
-            st.write("### ♟ Strategic Moves")
-            for m in strategy["moves"]:
-                st.write("•", m)
+            if strategy["risks"]:
+                st.write("### ⚠ Strategic Risks")
+                for r in strategy["risks"]:
+                    st.warning(r)
+
+            if strategy["moves"]:
+                st.write("### ♟ Strategic Moves")
+                for m in strategy["moves"]:
+                    st.write("•", m)
+
+        else:
+            st.info("No strategic analysis available yet.")
 
     else:
 
-        st.info("No strategic analysis available yet.")
+        st.warning("🔒 AI Life Strategy is a Pro feature.")
+
+    st.divider()
 
     # -------------------------
     # EXECUTIVE SUMMARY

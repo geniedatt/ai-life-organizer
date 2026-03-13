@@ -19,6 +19,9 @@ from ui.strategy_generator import strategy_generator_page
 # Command Center
 from pages.orchestrator import orchestrator_page
 
+# Monetization
+from pages.upgrade import upgrade_page
+
 # Performance
 from ui.daily_plan import daily_plan_page
 from ui.achievements import achievements_page
@@ -125,6 +128,9 @@ st.sidebar.header("👤 Account")
 if st.sidebar.button("Profile"):
     page = "profile"
 
+if st.sidebar.button("Upgrade to Pro 🚀"):
+    page = "upgrade"
+
 # -------------------------
 # DEFAULT PAGE
 # -------------------------
@@ -181,3 +187,6 @@ elif st.session_state.page == "leaderboard":
 
 elif st.session_state.page == "profile":
     profile_page()
+
+elif st.session_state.page == "upgrade":
+    upgrade_page()
