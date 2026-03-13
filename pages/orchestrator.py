@@ -2,6 +2,7 @@ import streamlit as st
 from engine.life_orchestrator import run_life_orchestrator
 from engine.executive_briefing import generate_executive_briefing
 from engine.strategic_planner import generate_daily_strategy
+from engine.schedule_generator import generate_daily_schedule
 
 
 def orchestrator_page():
@@ -16,19 +17,19 @@ def orchestrator_page():
 
     st.subheader("🧠 Daily Executive Briefing")
 
-    st.info(briefing["summary"])
+    st.info(briefing.get("summary", ""))
 
-    if briefing["focus"]:
+    if briefing.get("focus"):
         st.write("### 🎯 Strategic Focus")
         for f in briefing["focus"]:
             st.write("•", f)
 
-    if briefing["risks"]:
+    if briefing.get("risks"):
         st.write("### ⚠ Risks")
         for r in briefing["risks"]:
             st.warning(r)
 
-    if briefing["advice"]:
+    if briefing.get("advice"):
         st.write("### 🤖 Strategic Advice")
         for a in briefing["advice"]:
             st.write("•", a)
@@ -52,6 +53,24 @@ def orchestrator_page():
 
     else:
         st.info("No tasks available to plan today.")
+
+    st.divider()
+
+    # -------------------------
+    # AI DAILY SCHEDULE
+    # -------------------------
+
+    st.subheader("🗓 AI Daily Schedule")
+
+    schedule = generate_daily_schedule()
+
+    if schedule:
+
+        for block in schedule:
+            st.write(f"**{block['time']}** — {block['task']}")
+
+    else:
+        st.info("No tasks available to schedule today.")
 
     st.divider()
 
