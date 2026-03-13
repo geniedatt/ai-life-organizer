@@ -25,6 +25,11 @@ from ui.achievements import achievements_page
 from ui.weekly_review import weekly_review_page
 from ui.leaderboard import leaderboard_page
 
+# NEW AI SYSTEMS
+from pages.chief_of_staff import chief_of_staff_page
+from pages.trajectory import trajectory_page
+from pages.adaptive_strategy import adaptive_strategy_page
+
 
 # -------------------------
 # INITIALIZE DATABASE
@@ -58,8 +63,13 @@ st.sidebar.title("🧠 AI Life Organizer")
 
 page = None
 
+
+# -------------------------
 # COMMAND CENTER
+# -------------------------
+
 st.sidebar.header("⚡ Command")
+
 if st.sidebar.button("Dashboard"):
     page = "dashboard"
 
@@ -69,8 +79,14 @@ if st.sidebar.button("AI Strategist"):
 if st.sidebar.button("War Room"):
     page = "war_room"
 
+if st.sidebar.button("Strategic Command Center"):
+    page = "command_center"
 
+
+# -------------------------
 # EXECUTION
+# -------------------------
+
 st.sidebar.header("🎯 Execution")
 
 if st.sidebar.button("Goals"):
@@ -89,7 +105,10 @@ if st.sidebar.button("Weekly Plan"):
     page = "weekly"
 
 
+# -------------------------
 # AI SYSTEMS
+# -------------------------
+
 st.sidebar.header("🤖 AI Systems")
 
 if st.sidebar.button("AI Coach"):
@@ -98,14 +117,23 @@ if st.sidebar.button("AI Coach"):
 if st.sidebar.button("Life Map"):
     page = "life_map"
 
-if st.sidebar.button("Command Center"):
-    page = "command_center"
-
 if st.sidebar.button("Life Strategy"):
     page = "life_strategy"
 
+if st.sidebar.button("AI Chief of Staff"):
+    page = "chief_of_staff"
 
+if st.sidebar.button("Life Trajectory"):
+    page = "trajectory"
+
+if st.sidebar.button("Adaptive Strategy"):
+    page = "adaptive_strategy"
+
+
+# -------------------------
 # PERFORMANCE
+# -------------------------
+
 st.sidebar.header("📈 Performance")
 
 if st.sidebar.button("Analytics"):
@@ -121,7 +149,10 @@ if st.sidebar.button("Leaderboard"):
     page = "leaderboard"
 
 
+# -------------------------
 # ACCOUNT
+# -------------------------
+
 st.sidebar.header("👤 Account")
 
 if st.sidebar.button("Profile"):
@@ -152,6 +183,9 @@ elif st.session_state.page == "strategist":
 elif st.session_state.page == "war_room":
     war_room_page()
 
+elif st.session_state.page == "command_center":
+    command_center_page()
+
 elif st.session_state.page == "goals":
     goals_page()
 
@@ -173,11 +207,17 @@ elif st.session_state.page == "coach":
 elif st.session_state.page == "life_map":
     life_map_page()
 
-elif st.session_state.page == "command_center":
-    command_center_page()
-
 elif st.session_state.page == "life_strategy":
     strategy_generator_page()
+
+elif st.session_state.page == "chief_of_staff":
+    chief_of_staff_page()
+
+elif st.session_state.page == "trajectory":
+    trajectory_page()
+
+elif st.session_state.page == "adaptive_strategy":
+    adaptive_strategy_page()
 
 elif st.session_state.page == "analytics":
     analytics_page()
