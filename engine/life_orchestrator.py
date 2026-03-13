@@ -1,32 +1,79 @@
 from database import get_tasks, get_habits
-from engine.life_score import calculate_life_score
+
+from ai.chief_of_staff import chief_of_staff_analysis
+from ai.trajectory_simulator import simulate_life_trajectory
+from engine.adaptive_strategy import generate_adaptive_strategy
 
 
-def orchestrate_life():
+def run_life_orchestrator():
 
     tasks = get_tasks()
     habits = get_habits()
 
-    life_score = calculate_life_score(tasks, habits)
+    if tasks is None:
+        tasks = []
 
-    priorities = []
+    if habits is None:
+        habits = []
 
-    if life_score < 40:
+    # -------------------------
+    # TASK METRICS
+    # -------------------------
 
-        priorities.append("Stabilize habits")
-        priorities.append("Reduce task load")
+    total_tasks = len(tasks)
 
-    elif life_score < 70:
+    completed_tasks = 0
 
-        priorities.append("Improve consistency")
-        priorities.append("Focus on top goals")
+    for task in tasks:
+        try:
+            if task[3] == 1:
+                completed_tasks += 1
+        except:
+            pass
 
-    else:
+    completion_rate = 0
 
-        priorities.append("Scale ambition")
-        priorities.append("Increase challenge")
+    if total_tasks > 0:
+        completion_rate = round((completed_tasks / total_tasks) * 100)
+
+    # -------------------------
+    # HABIT MOMENTUM
+    # -------------------------
+
+    habit_score = 0
+
+    for habit in habits:
+        try:
+            streak = habit[2]
+            habit_score += streak
+        except:
+            pass
+
+    # -------------------------
+    # AI SYSTEMS
+    # -------------------------
+
+    chief = chief_of_staff_analysis(tasks, habits)
+
+    trajectory = simulate_life_trajectory(tasks, habits)
+
+    adaptive = generate_adaptive_strategy(tasks, habits)
+
+    # -------------------------
+    # LIFE SCORE
+    # -------------------------
+
+    life_score = completion_rate + habit_score
+
+    # -------------------------
+    # ORCHESTRATOR OUTPUT
+    # -------------------------
 
     return {
         "life_score": life_score,
-        "priorities": priorities
+        "task_completion": completion_rate,
+        "habit_strength": habit_score,
+        "chief_of_staff": chief,
+        "trajectory": trajectory,
+        "adaptive_strategy": adaptive
     }

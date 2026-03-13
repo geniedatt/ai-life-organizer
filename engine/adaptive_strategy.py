@@ -49,3 +49,17 @@ def adjust_strategy():
         )
 
     return strategy_changes
+
+
+# -------------------------------------------------
+# ORCHESTRATOR COMPATIBILITY FUNCTION
+# -------------------------------------------------
+
+def generate_adaptive_strategy(tasks=None, habits=None):
+
+    strategy = adjust_strategy()
+
+    if not strategy:
+        return "No strategy adjustments needed."
+
+    return "\n".join(strategy)

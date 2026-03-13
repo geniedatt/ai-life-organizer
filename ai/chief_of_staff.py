@@ -106,3 +106,29 @@ def chief_of_staff_advice():
         "advice": advice,
         "state": state
     }
+
+
+# -------------------------------------------------
+# ORCHESTRATOR COMPATIBILITY FUNCTION
+# -------------------------------------------------
+
+def chief_of_staff_analysis(tasks=None, habits=None):
+
+    report = chief_of_staff_advice()
+
+    advice = report["advice"]
+    focus = report["focus"]
+    risks = report["risks"]
+
+    output = []
+
+    if focus:
+        output.append("Focus: " + ", ".join(focus))
+
+    if risks:
+        output.append("Risks: " + ", ".join(risks))
+
+    if advice:
+        output.append("Advice: " + " ".join(advice))
+
+    return "\n\n".join(output)

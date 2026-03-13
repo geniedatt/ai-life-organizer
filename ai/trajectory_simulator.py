@@ -3,10 +3,15 @@ from engine.life_score import calculate_life_score
 from engine.momentum import calculate_momentum
 
 
-def simulate_life_trajectory():
+def simulate_life_trajectory(tasks=None, habits=None):
 
-    tasks = get_tasks()
-    habits = get_habits()
+    # Allow orchestrator to pass data or fetch it internally
+    if tasks is None:
+        tasks = get_tasks()
+
+    if habits is None:
+        habits = get_habits()
+
     habit_logs = get_all_habit_activity()
 
     life_score = calculate_life_score(tasks, habits)
@@ -24,7 +29,11 @@ def simulate_life_trajectory():
     # Project future state
     # ------------------------
 
-    progress_factor = (life_score * 0.4) + (momentum * 0.4) + (completion_rate * 100 * 0.2)
+    progress_factor = (
+        (life_score * 0.4) +
+        (momentum * 0.4) +
+        (completion_rate * 100 * 0.2)
+    )
 
     if progress_factor < 40:
 

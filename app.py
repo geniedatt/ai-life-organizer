@@ -30,6 +30,8 @@ from pages.chief_of_staff import chief_of_staff_page
 from pages.trajectory import trajectory_page
 from pages.adaptive_strategy import adaptive_strategy_page
 
+from pages.orchestrator import orchestrator_page
+
 
 # -------------------------
 # INITIALIZE DATABASE
@@ -81,6 +83,9 @@ if st.sidebar.button("War Room"):
 
 if st.sidebar.button("Strategic Command Center"):
     page = "command_center"
+
+if st.sidebar.button("Life Orchestrator"):
+    page = "orchestrator"
 
 
 # -------------------------
@@ -233,3 +238,6 @@ elif st.session_state.page == "leaderboard":
 
 elif st.session_state.page == "profile":
     profile_page()
+
+elif st.session_state.page == "orchestrator":
+    orchestrator_page()
