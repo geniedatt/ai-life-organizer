@@ -11,32 +11,24 @@ from ui.analytics import analytics_page
 from ui.weekly import weekly_page
 from ui.profile import profile_page
 
-# AI Features
+# AI Systems
 from ui.coach_chat import coach_chat_page
 from ui.life_map import life_map_page
-from ui.command_center import command_center_page
 from ui.strategy_generator import strategy_generator_page
-from ui.strategist import strategist_page
-from ui.war_room import war_room_page
 
-# Viral Features
+# Command Center
+from pages.orchestrator import orchestrator_page
+
+# Performance
 from ui.daily_plan import daily_plan_page
 from ui.achievements import achievements_page
 from ui.weekly_review import weekly_review_page
 from ui.leaderboard import leaderboard_page
 
-# NEW AI SYSTEMS
-from pages.chief_of_staff import chief_of_staff_page
-from pages.trajectory import trajectory_page
-from pages.adaptive_strategy import adaptive_strategy_page
-
-from pages.orchestrator import orchestrator_page
-
 
 # -------------------------
 # INITIALIZE DATABASE
 # -------------------------
-
 init_db()
 
 st.set_page_config(
@@ -48,7 +40,6 @@ st.set_page_config(
 # -------------------------
 # PWA SUPPORT
 # -------------------------
-
 st.markdown(
     """
 <link rel="manifest" href="/static/manifest.json">
@@ -60,38 +51,24 @@ st.markdown(
 # -------------------------
 # SIDEBAR
 # -------------------------
-
 st.sidebar.title("🧠 AI Life Organizer")
 
 page = None
 
-
 # -------------------------
 # COMMAND CENTER
 # -------------------------
-
 st.sidebar.header("⚡ Command")
 
 if st.sidebar.button("Dashboard"):
     page = "dashboard"
 
-if st.sidebar.button("AI Strategist"):
-    page = "strategist"
-
-if st.sidebar.button("War Room"):
-    page = "war_room"
-
-if st.sidebar.button("Strategic Command Center"):
+if st.sidebar.button("Command Center"):
     page = "command_center"
-
-if st.sidebar.button("Life Orchestrator"):
-    page = "orchestrator"
-
 
 # -------------------------
 # EXECUTION
 # -------------------------
-
 st.sidebar.header("🎯 Execution")
 
 if st.sidebar.button("Goals"):
@@ -109,11 +86,9 @@ if st.sidebar.button("Daily Plan"):
 if st.sidebar.button("Weekly Plan"):
     page = "weekly"
 
-
 # -------------------------
 # AI SYSTEMS
 # -------------------------
-
 st.sidebar.header("🤖 AI Systems")
 
 if st.sidebar.button("AI Coach"):
@@ -125,20 +100,9 @@ if st.sidebar.button("Life Map"):
 if st.sidebar.button("Life Strategy"):
     page = "life_strategy"
 
-if st.sidebar.button("AI Chief of Staff"):
-    page = "chief_of_staff"
-
-if st.sidebar.button("Life Trajectory"):
-    page = "trajectory"
-
-if st.sidebar.button("Adaptive Strategy"):
-    page = "adaptive_strategy"
-
-
 # -------------------------
 # PERFORMANCE
 # -------------------------
-
 st.sidebar.header("📈 Performance")
 
 if st.sidebar.button("Analytics"):
@@ -153,43 +117,31 @@ if st.sidebar.button("Achievements"):
 if st.sidebar.button("Leaderboard"):
     page = "leaderboard"
 
-
 # -------------------------
 # ACCOUNT
 # -------------------------
-
 st.sidebar.header("👤 Account")
 
 if st.sidebar.button("Profile"):
     page = "profile"
 
-
 # -------------------------
 # DEFAULT PAGE
 # -------------------------
-
 if "page" not in st.session_state:
     st.session_state.page = "dashboard"
 
 if page:
     st.session_state.page = page
 
-
 # -------------------------
 # ROUTING
 # -------------------------
-
 if st.session_state.page == "dashboard":
     dashboard_page()
 
-elif st.session_state.page == "strategist":
-    strategist_page()
-
-elif st.session_state.page == "war_room":
-    war_room_page()
-
 elif st.session_state.page == "command_center":
-    command_center_page()
+    orchestrator_page()
 
 elif st.session_state.page == "goals":
     goals_page()
@@ -215,15 +167,6 @@ elif st.session_state.page == "life_map":
 elif st.session_state.page == "life_strategy":
     strategy_generator_page()
 
-elif st.session_state.page == "chief_of_staff":
-    chief_of_staff_page()
-
-elif st.session_state.page == "trajectory":
-    trajectory_page()
-
-elif st.session_state.page == "adaptive_strategy":
-    adaptive_strategy_page()
-
 elif st.session_state.page == "analytics":
     analytics_page()
 
@@ -238,6 +181,3 @@ elif st.session_state.page == "leaderboard":
 
 elif st.session_state.page == "profile":
     profile_page()
-
-elif st.session_state.page == "orchestrator":
-    orchestrator_page()
