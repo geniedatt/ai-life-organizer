@@ -110,9 +110,9 @@ def dashboard_page():
 
         for habit in habits:
 
-            habit_id = habit[0]
-            habit_name = habit[1]
-            streak = habit[2] if len(habit) > 2 else 0
+            habit_id = habit["id"]
+            habit_name = habit["habit"]
+            streak = habit.get("streak", 0)
 
             label = f"{habit_name} — 🔥 {streak} day streak"
             lower = habit_name.lower()

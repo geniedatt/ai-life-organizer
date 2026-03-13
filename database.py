@@ -7,7 +7,9 @@ from datetime import date, datetime, timedelta
 # -----------------------------
 
 def get_connection():
-    return sqlite3.connect("tasks.db")
+    conn = sqlite3.connect("tasks.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 # -----------------------------
@@ -55,7 +57,7 @@ def init_db():
     )
     """)
 
-    # HABIT LOGS TABLE (for real streak tracking)
+    # HABIT LOGS TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS habit_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,7 +107,7 @@ def get_tasks():
         "SELECT id, task, completed FROM tasks"
     )
 
-    tasks = cursor.fetchall()
+    tasks = [dict(row) for row in cursor.fetchall()]
 
     conn.close()
 
@@ -179,7 +181,7 @@ def get_streak(task_id):
     conn.close()
 
     if result:
-        return result[0]
+        return result["streak"]
 
     return 0
 
@@ -221,7 +223,8 @@ def get_habits():
         cursor.execute(
             "SELECT id, habit, streak FROM habits"
         )
-        habits = cursor.fetchall()
+
+        habits = [dict(row) for row in cursor.fetchall()]
 
     except sqlite3.OperationalError:
         habits = []
@@ -256,7 +259,6 @@ def log_habit_completion(habit_id):
 
     today = date.today().isoformat()
 
-    # Prevent duplicate logs for same day
     cursor.execute(
         "SELECT * FROM habit_logs WHERE habit_id=? AND completed_date=?",
         (habit_id, today)
@@ -288,6 +290,7 @@ def calculate_streak(habit_id):
     """, (habit_id,))
 
     rows = cursor.fetchall()
+
     conn.close()
 
     if not rows:
@@ -298,7 +301,7 @@ def calculate_streak(habit_id):
 
     for row in rows:
 
-        log_date = datetime.strptime(row[0], "%Y-%m-%d").date()
+        log_date = datetime.strptime(row["completed_date"], "%Y-%m-%d").date()
 
         if log_date == today - timedelta(days=streak):
             streak += 1
@@ -306,6 +309,50 @@ def calculate_streak(habit_id):
             break
 
     return streak
+
+
+# -----------------------------
+# HABIT ACTIVITY (PER HABIT)
+# -----------------------------
+
+def get_habit_activity(habit_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT completed_date
+    FROM habit_logs
+    WHERE habit_id=?
+    """, (habit_id,))
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return [row["completed_date"] for row in rows]
+
+
+# -----------------------------
+# HABIT ACTIVITY (ALL HABITS)
+# -----------------------------
+
+def get_all_habit_activity():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT habit_id, completed_date
+    FROM habit_logs
+    ORDER BY completed_date DESC
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return [dict(row) for row in rows]
 
 
 # -----------------------------
@@ -342,7 +389,7 @@ def get_weekly_plan():
     conn.close()
 
     if result:
-        return result[0]
+        return result["plan"]
 
     return None
 
@@ -378,24 +425,8 @@ def get_memory():
 
     conn.close()
 
-    return [r[0] for r in rows]
+    return [row["note"] for row in rows]
 
-
-def get_habit_activity(habit_id):
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    SELECT completed_date
-    FROM habit_logs
-    WHERE habit_id=?
-    """, (habit_id,))
-
-    rows = cursor.fetchall()
-    conn.close()
-
-    return {r[0] for r in rows}
 
 # --------------------------------------------------
 # XP SYSTEM
@@ -409,11 +440,11 @@ def calculate_xp():
 
     for habit in habits:
 
-        habit_id = habit[0]
+        habit_id = habit["id"]
+
         activity = get_habit_activity(habit_id)
 
-        if activity:
-            total_completions += len(activity)
+        total_completions += len(activity)
 
     xp = total_completions * 10
 
