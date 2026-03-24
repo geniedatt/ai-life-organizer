@@ -1,4 +1,16 @@
-*.txt
+# Environment
 .env
 secrets.toml
-*_KEY*
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# Databases
+*.db
+
+# Misc
+.DS_Store
