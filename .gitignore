@@ -14,3 +14,10 @@ venv/
 
 # Misc
 .DS_Store
+
+.env
+*.txt
+venv/
+__pycache__/
+*.pyc
+*.db
